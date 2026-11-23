@@ -5,13 +5,23 @@ import { useSearchParams } from 'next/navigation';
 import { Loader2, CheckCircle, AlertTriangle, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 
+const COURSE_LABELS: Record<string, string> = {
+  macro: 'AP Macro',
+  micro: 'AP Micro',
+  gov: 'AP Gov',
+  stats: 'AP Stats',
+  bundle: 'AP Macro and AP Micro',
+};
+
 function SeasonPassClaimContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
 
-  const [status, setStatus] = useState<'loading' | 'needs_login' | 'ready' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'needs_login' | 'linked' | 'error'>('loading');
   const [email, setEmail] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [courseType, setCourseType] = useState<string | null>(null);
+  const [isParentGift, setIsParentGift] = useState(false);
 
   useEffect(() => {
     if (!sessionId) {
@@ -29,6 +39,12 @@ function SeasonPassClaimContent() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Failed to process claim');
+        setCourseType(data.courseType ?? null);
+        if (data.linked) {
+          setIsParentGift(Boolean(data.isParentGift));
+          setStatus('linked');
+          return;
+        }
         setEmail(data.email);
         setStatus('needs_login');
       } catch (err: any) {
@@ -64,7 +80,33 @@ function SeasonPassClaimContent() {
     );
   }
 
-  // needs_login or ready both just tell them to log in/sign up with checkout email for now
+  if (status === 'linked') {
+    const courseLabel = (courseType && COURSE_LABELS[courseType]) || 'AP Dojo';
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+        <div className="max-w-md w-full bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-10 text-center space-y-6">
+          <CheckCircle className="h-16 w-16 mx-auto text-green-500" />
+          <h1 className="text-2xl font-extrabold text-gray-900">Season Pass Activated</h1>
+          <p className="text-sm text-gray-700">
+            {isParentGift
+              ? `Your payment was successful. The ${courseLabel} Season Pass is now on your student's account.`
+              : `Your payment was successful. Your ${courseLabel} Season Pass is now on your account.`}
+          </p>
+          <div className="pt-2">
+            <Link
+              href="/"
+              className="inline-flex w-full max-w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-600 px-3 py-2 text-xs font-bold text-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:bg-blue-700 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all sm:px-4 sm:py-2.5 sm:text-sm"
+            >
+              {isParentGift ? 'Back to AP Dojo' : 'Start practicing'}
+              <ArrowRight className="h-4 w-4 shrink-0" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Guest checkout: the pass waits for an account with the checkout email.
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full bg-white border-4 border-black rounded-3xl shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] p-10 text-center space-y-6">

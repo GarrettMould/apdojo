@@ -17,7 +17,7 @@ const headshotCrop = 'object-cover object-[50%_0%] scale-[1.35] origin-[50%_12%]
 const DISMISS_KEY = 'apdojo_tutoring_promo_dismissed_v1';
 
 const SESSION_STEPS = [
-  { title: 'Book a time', body: 'Pick a slot and tell me what you are stuck on.' },
+  { title: 'Book a time', body: 'Pick a slot and tell me what you are stuck on. Your Google Meet link arrives by email.' },
   { title: 'Meet on Google Meet', body: 'We work through real AP questions together, live.' },
   { title: 'Leave with a plan', body: 'A short list of what to practice next on AP Dojo.' },
 ];
@@ -202,7 +202,7 @@ export function TutoringPromo({
         </div>
       </div>
       <Link
-        href="/tutoring"
+        href="/tutoring#calendar"
         onClick={onClick}
         className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700"
       >

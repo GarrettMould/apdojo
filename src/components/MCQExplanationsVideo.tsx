@@ -114,6 +114,18 @@ const chapters = [
   }
 ];
 
+/** Chapters skipped in playback: Question 5 shows an old version of the question and circles the wrong answer. */
+const HIDDEN_CHAPTER_IDS = [5];
+const visibleChapters = chapters.filter((chapter) => !HIDDEN_CHAPTER_IDS.includes(chapter.id));
+
+/** The time to jump to if `time` falls inside a hidden chapter. */
+function skipHiddenChapter(time: number): number | null {
+  const hidden = chapters.find(
+    (chapter) => HIDDEN_CHAPTER_IDS.includes(chapter.id) && time >= chapter.start && time < chapter.end + 1,
+  );
+  return hidden ? hidden.end + 1 : null;
+}
+
 export function MCQExplanationsVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [currentChapter, setCurrentChapter] = useState(1);
@@ -126,6 +138,11 @@ export function MCQExplanationsVideo() {
 
     const handleTimeUpdate = () => {
       const currentTime = video.currentTime;
+      const skipTo = skipHiddenChapter(currentTime);
+      if (skipTo !== null) {
+        video.currentTime = skipTo;
+        return;
+      }
       const chapter = chapters.find(ch => currentTime >= ch.start && currentTime <= ch.end);
       if (chapter && chapter.id !== currentChapter) {
         setCurrentChapter(chapter.id);
@@ -135,7 +152,11 @@ export function MCQExplanationsVideo() {
     };
 
     video.addEventListener('timeupdate', handleTimeUpdate);
-    return () => video.removeEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('seeking', handleTimeUpdate);
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('seeking', handleTimeUpdate);
+    };
   }, [currentChapter]);
 
   // Jump to specific chapter
@@ -194,7 +215,7 @@ export function MCQExplanationsVideo() {
                 <p className="text-lg text-gray-600">Unit 1 - AP Macroeconomics</p>
               </div>
               <div className="flex flex-wrap gap-2 justify-start">
-                {chapters.map((chapter) => (
+                {visibleChapters.map((chapter) => (
                   <button
                     key={chapter.id}
                     onClick={() => jumpToChapter(chapter.id)}

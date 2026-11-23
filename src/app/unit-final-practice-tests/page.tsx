@@ -235,8 +235,8 @@ function UnitFinalPracticeTestsContent() {
       ? { mcqQuestions: 55, mcqMinutes: 80, frqQuestions: 4, frqMinutes: 100 }
       : { mcqQuestions: 60, mcqMinutes: 70, frqQuestions: 3, frqMinutes: 60 };
 
-  const fullMcqComingSoon = isGov || (isStats && !FEATURES.statsFullMcqExam);
-  const fullFrqComingSoon = isGov || (isStats && !FEATURES.statsFullFrqExam);
+  const fullMcqComingSoon = (isGov && !FEATURES.govFullMcqExam) || (isStats && !FEATURES.statsFullMcqExam);
+  const fullFrqComingSoon = (isGov && !FEATURES.govFullFrqExam) || (isStats && !FEATURES.statsFullFrqExam);
   const fullExamsComingSoon = fullMcqComingSoon && fullFrqComingSoon;
 
   const formatMinutes = (minutes: number) => {

@@ -257,6 +257,12 @@ const nextConfig = {
       destination: '/preview/stats/mcq/1',
     });
 
+    // Gov: /ap-gov-mcq-practice-test-1 → /preview/gov/mcq/1
+    rewrites.push({
+      source: '/ap-gov-mcq-practice-test-1',
+      destination: '/preview/gov/mcq/1',
+    });
+
     // Full FRQ practice tests
     // Macro: /ap-macro-frq-practice-test-1 → /preview/macro/frq/1
     rewrites.push({
@@ -280,6 +286,12 @@ const nextConfig = {
     rewrites.push({
       source: '/ap-stats-frq-practice-test-1',
       destination: '/preview/stats/frq/1',
+    });
+
+    // Gov: /ap-gov-frq-practice-test-1 → /preview/gov/frq/1
+    rewrites.push({
+      source: '/ap-gov-frq-practice-test-1',
+      destination: '/preview/gov/frq/1',
     });
 
     // Pretty practice-test URLs are real routes now so they can have their own canonicals.

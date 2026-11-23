@@ -19,10 +19,10 @@ export const govUnit3McqTestQuestions: Question[] = [
       'Questions 1-2 refer to the following excerpt.\n\n"You express a great deal of anxiety over our willingness to break laws. This is certainly a legitimate concern. Since we so diligently urge people to obey the Supreme Court’s decision of 1954 outlawing segregation in the public schools, at first glance it may seem paradoxical for us consciously to break laws. One may well ask: "How can you advocate breaking some laws and obeying others?" The answer lies in the fact that there are two types of laws: just and unjust. I would be the first to advocate obeying just laws. One has not only a legal but a moral responsibility to obey just laws. Conversely, one has a moral responsibility to disobey unjust laws."\n—Dr. Martin Luther King Jr., "Letter from a Birmingham Jail," 1963\n\nBased on the excerpt, which of the following best summarizes King’s argument regarding the obligation of citizens in a democracy?',
     image: null,
     options: [
-      'Citizens should adhere to all laws, regardless of their content, to ensure social order.',
-      'Unjust laws are only valid if they are passed by a legislative majority.',
+      'Citizens should obey laws regardless of their content, because stable social order depends on compliance.',
+      'Unjust laws retain their validity as long as they are passed by a legislative majority.',
       'Citizens have a moral imperative to challenge laws that violate human dignity or constitutional rights.',
-      'The Supreme Court is the only entity with the authority to declare a law unjust.',
+      'The Supreme Court holds the primary authority to decide when a law is unjust, and citizens should await its ruling.',
     ],
     correctAnswer: 'C',
     explanation:
@@ -59,9 +59,9 @@ export const govUnit3McqTestQuestions: Question[] = [
       'Question 3 refers to the following excerpt.\n\n"No State shall make or enforce any law which shall abridge the privileges or immunities of citizens of the United States; nor shall any State deprive any person of life, liberty, or property, without due process of law; nor deny to any person within its jurisdiction the equal protection of the laws."\n—Fourteenth Amendment, 1868\n\nWhich of the following constitutional doctrines is most clearly supported by the text of the Fourteenth Amendment?',
     image: null,
     options: [
-      'The doctrine of total state sovereignty.',
-      'The doctrine of absolute judicial restraint.',
-      'The doctrine of implied presidential emergency powers.',
+      'The doctrine of state sovereignty over individual civil liberties.',
+      'The doctrine of judicial restraint in reviewing state legislation.',
+      'The doctrine of implied presidential emergency powers in wartime.',
       'The doctrine of selective incorporation of the Bill of Rights.',
     ],
     correctAnswer: 'D',
@@ -79,10 +79,10 @@ export const govUnit3McqTestQuestions: Question[] = [
       'Question 4 refers to the following excerpt.\n\n"Congress shall make no law... abridging the freedom of speech, or of the press; or the right of the people peaceably to assemble, and to petition the Government for a redress of grievances."\n—First Amendment, 1791\n\nWhich of the following scenarios would constitute a direct violation of the protections listed above?',
     image: null,
     options: [
-      'A school district requires all students to wear uniforms.',
+      'A public school district requires all of its students to wear uniforms during the regular school day.',
       'A city council denies a permit for a protest because they disagree with the protesters’ message.',
-      'The federal government imposes a tax on all commercial radio advertisements.',
-      'A local library requires library cards to check out materials.',
+      'The federal government imposes a general tax on commercial radio advertisements sold nationwide each year.',
+      'A local public library requires patrons to present a valid library card before checking out materials.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -119,10 +119,10 @@ export const govUnit3McqTestQuestions: Question[] = [
       'How does the Due Process clause of the Fifth Amendment apply to the federal government compared to the Fourteenth Amendment’s application to the states?',
     image: null,
     options: [
-      'They are identical in wording and have no difference in application.',
-      'The Fifth Amendment only applies to civil cases, whereas the Fourteenth Amendment applies to all cases and completely replaces the Fifth Amendment\'s due process guarantee.',
+      'The two clauses are identical in wording and application, so each one restricts the national government and the states in the same way.',
+      'The Fifth Amendment applies mainly to civil cases, whereas the Fourteenth Amendment applies to criminal cases and governs both federal and state courts.',
       'The Fifth Amendment protects the accused from the national government, while the Fourteenth Amendment protects the accused from state governments.',
-      'The Fourteenth Amendment supersedes and completely replaces the Fifth Amendment.',
+      'The Fourteenth Amendment superseded the Fifth Amendment, so due process claims against the national government now arise under the later amendment.',
     ],
     correctAnswer: 'C',
     explanation:
@@ -139,10 +139,10 @@ export const govUnit3McqTestQuestions: Question[] = [
       'A state law prohibits the carrying of firearms in public spaces. A citizen challenges the law, arguing it violates the Second Amendment. Which of the following constitutional doctrines would the Supreme Court most likely use to evaluate this claim against the state government?',
     image: null,
     options: [
-      'The Supremacy Clause, because federal law automatically overrides state law and because the Second Amendment has never been incorporated against the states',
+      'The Supremacy Clause, because federal law overrides conflicting state law, which makes the Second Amendment directly binding on state governments',
       "Selective incorporation via the 14th Amendment's Due Process Clause, because the Second Amendment has been incorporated against the states",
-      'The Necessary and Proper Clause, because gun regulation is implied in federal power',
-      'The 10th Amendment, because states retain exclusive authority over public safety',
+      'The Necessary and Proper Clause, because the regulation of firearms is an implied power that Congress may exercise in place of state governments',
+      'The 10th Amendment, because public safety is a reserved power that state governments may regulate without any federal constitutional limits',
     ],
     correctAnswer: 'B',
     explanation:
@@ -159,9 +159,9 @@ export const govUnit3McqTestQuestions: Question[] = [
       'A city ordinance prohibits the use of amplified sound in a public park between 10pm and 7am. A political group argues this violates their First Amendment rights. Which of the following best describes the constitutionality of this ordinance?',
     image: null,
     options: [
-      'Unconstitutional, because the government can never restrict speech in a public forum',
-      'Unconstitutional, because the restriction targets the political content of the group\'s message',
-      'Constitutional, because political speech in public parks receives no First Amendment protection',
+      'Unconstitutional, because a public park is a traditional public forum where the government may not regulate how or when speech occurs',
+      "Unconstitutional, because a ban on amplified sound at night is a content-based restriction that targets the group's political message",
+      'Constitutional, because political speech in public parks is treated as conduct and therefore receives only minimal First Amendment protection',
       'Constitutional, because it is a content-neutral time, place, and manner restriction that serves a significant government interest',
     ],
     correctAnswer: 'D',
@@ -179,9 +179,9 @@ export const govUnit3McqTestQuestions: Question[] = [
       'A newspaper obtains classified documents revealing government misconduct and plans to publish them. The federal government seeks a court order to block publication. This action is best described as:',
     image: null,
     options: [
-      'A legitimate exercise of executive war powers that courts must defer to',
-      'An example of symbolic speech regulation, which receives reduced constitutional protection',
-      'A valid application of the exclusionary rule to protect national security',
+      'A legitimate exercise of executive war powers, to which courts generally defer on national security',
+      'An example of symbolic speech regulation, which receives reduced protection under the First Amendment',
+      'A valid application of the exclusionary rule, which keeps unlawfully obtained material private',
       'Prior restraint, which carries a heavy presumption of unconstitutionality under First Amendment doctrine',
     ],
     correctAnswer: 'D',
@@ -199,10 +199,10 @@ export const govUnit3McqTestQuestions: Question[] = [
       'Which pair of Supreme Court cases established, first, that the Second Amendment protects an individual right to bear arms, and second, that this right applies to state governments?',
     image: null,
     options: [
-      'Tinker v. Des Moines and Gideon v. Wainwright',
+      'United States v. Lopez and Gideon v. Wainwright',
       'District of Columbia v. Heller and McDonald v. Chicago',
-      'Miranda v. Arizona and Mapp v. Ohio',
-      'Brown v. Board of Education and Engel v. Vitale',
+      'New York Times Co. v. United States and Mapp v. Ohio',
+      'Brown v. Board of Education and Schenck v. United States',
     ],
     correctAnswer: 'B',
     explanation:
@@ -219,9 +219,9 @@ export const govUnit3McqTestQuestions: Question[] = [
       'Police officers enter a home without a warrant and discover evidence of a crime. At trial, the prosecution attempts to use this evidence. Under which doctrine would the defense most likely move to have the evidence excluded?',
     image: null,
     options: [
-      'The doctrine of selective incorporation, because state police violated a federal standard',
+      'The doctrine of selective incorporation, because state police violated a standard set by federal law alone',
       'The exclusionary rule, because evidence obtained through an unconstitutional search cannot be used in court',
-      'Substantive due process, because the law criminalizing the behavior is itself unjust',
+      "Substantive due process, because the law criminalizing the defendant's behavior is itself unjust",
       'The doctrine of prior restraint, because the government acted before a judicial determination of guilt',
     ],
     correctAnswer: 'B',
@@ -243,9 +243,9 @@ export const govUnit3McqTestQuestions: Question[] = [
     },
     options: [
       'Shifting public attitudes about cruel and unusual punishment, increased awareness of wrongful convictions, and changing social norms have contributed to declining support over time.',
-      'The Supreme Court ruled capital punishment unconstitutional for all crimes in 1994, which shifted public opinion and accounts for the entire decline in support shown in the data.',
-      'Congress passed legislation banning the death penalty in federal cases, which influenced state-level public opinion.',
-      'The decline reflects a generational effect in which all Americans born after 1980 oppose capital punishment.',
+      'The Supreme Court ruled capital punishment unconstitutional for all crimes in 1994, which shifted public opinion and accounts for the decline in support shown in the data.',
+      'Congress passed legislation banning the death penalty in federal cases, and this national policy change gradually reshaped public opinion about capital punishment in the states.',
+      'The decline reflects a sustained rise in violent crime since 1994, which has persuaded most Americans that capital punishment does not deter serious offenses.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -265,9 +265,9 @@ export const govUnit3McqTestQuestions: Question[] = [
       alt: 'Line graph showing public support for the death penalty over time since 1994',
     },
     options: [
-      'The incorporation doctrine, which requires states to apply federal standards for capital punishment and forbids the Court from considering changing public views of cruelty.',
-      'The equal protection clause, which prohibits the application of the death penalty to any protected class.',
-      'The due process clause, which requires unanimous jury verdicts before a death sentence can be imposed.',
+      'The incorporation doctrine, which requires states to follow federal standards for capital punishment and directs the Court to disregard changing public views when it decides what counts as cruel.',
+      'The equal protection clause, which the Court has read to prohibit applying the death penalty to members of any protected class, whatever their offense or circumstances.',
+      'The due process clause, which the Court has read to require a unanimous jury recommendation in every capital case before a state may impose a sentence of death.',
       'The principle of evolving standards of decency, in which the Supreme Court considers shifting public opinion when evaluating whether a punishment constitutes cruel and unusual punishment.',
     ],
     correctAnswer: 'D',
@@ -285,9 +285,9 @@ export const govUnit3McqTestQuestions: Question[] = [
     image: null,
     options: [
       "Substantive due process focuses on the fairness of the laws themselves, while procedural focuses on the fairness of the government's methods.",
-      'Substantive due process only applies to the federal government, while procedural applies to states, and the two terms are otherwise legally interchangeable.',
-      'Substantive due process is only used in civil cases, while procedural is only used in criminal cases.',
-      'There is no difference; the terms are legally interchangeable.',
+      'Substantive due process applies mainly to the federal government, while procedural due process applies to the states through the Fourteenth Amendment.',
+      'Substantive due process is generally used in civil cases, while procedural due process is generally reserved for criminal prosecutions in federal court.',
+      "The two terms are largely interchangeable, since each one asks whether the government followed fair and lawful steps before acting on a person's rights.",
     ],
     correctAnswer: 'A',
     explanation:
@@ -307,10 +307,10 @@ export const govUnit3McqTestQuestions: Question[] = [
       alt: 'Line graph showing public support for legal recognition of same-sex marriage over time',
     },
     options: [
-      'Congress passed the Defense of Marriage Act in 1996, which accelerated public support for same-sex marriage by drawing national attention to the issue.',
-      'The Supreme Court\'s decision in Engel v. Vitale expanded the right to privacy to include personal relationship choices and required states to recognize same-sex marriages on that basis alone.',
-      'The Supreme Court\'s use of the Due Process and Equal Protection Clauses to strike down laws restricting same-sex relationships reflected and reinforced a broader shift in public attitudes toward equal treatment under the law.',
-      'The incorporation of the First Amendment\'s free exercise clause to the states required state governments to recognize same-sex marriages performed in other states.',
+      'Congress passed the Defense of Marriage Act in 1996, which accelerated public support for same-sex marriage by drawing national attention to the issue and prompting states to expand legal recognition.',
+      "The Supreme Court's decision in Engel v. Vitale expanded the right to privacy to include personal relationship choices, which required states to recognize same-sex marriages and encouraged the public to accept them.",
+      "The Supreme Court's use of the Due Process and Equal Protection Clauses to strike down laws restricting same-sex relationships reflected and reinforced a broader shift in public attitudes toward equal treatment under the law.",
+      "The incorporation of the First Amendment's free exercise clause against the states required state governments to recognize same-sex marriages performed elsewhere, which moved public attitudes toward acceptance.",
     ],
     correctAnswer: 'C',
     explanation:
@@ -331,9 +331,9 @@ export const govUnit3McqTestQuestions: Question[] = [
     },
     options: [
       'Organized social movements can shift public opinion over time, creating political pressure that eventually influences both legislative and judicial responses, consistent with the pluralist model of democracy.',
-      'Public opinion has no measurable effect on Supreme Court decisions because justices are insulated from political pressure through lifetime appointments.',
-      'The Supreme Court consistently leads public opinion by striking down discriminatory laws before a majority of Americans support change.',
-      'The data demonstrates that civil liberties expansions occur exclusively through constitutional amendments rather than through judicial reinterpretation of existing clauses.',
+      'Public opinion tends to have little measurable effect on Supreme Court decisions because lifetime appointments insulate justices from political pressure, leaving elected branches to respond to social movements.',
+      'The Supreme Court has generally led public opinion by striking down discriminatory laws well before most Americans supported change, which suggests that social movements follow judicial action.',
+      'The data suggests that civil liberties expansions occur primarily through constitutional amendments, with social movements securing formal changes to the text rather than new judicial readings of existing clauses.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -351,9 +351,9 @@ export const govUnit3McqTestQuestions: Question[] = [
     image: null,
     options: [
       'Brown v. Board of Education (1954), because separate public schools are inherently unequal regardless of physical conditions',
-      'Plessy v. Ferguson (1896), because the state has ensured truly equal facilities and because separate public schools can still satisfy equal protection',
-      'Shaw v. Reno (1993), because the law draws electoral district lines based on race',
-      'Engel v. Vitale (1962), because the state is imposing religious practices in schools',
+      'Plessy v. Ferguson (1896), because separate public schools satisfy equal protection when the state provides comparable facilities',
+      'Shaw v. Reno (1993), because the law uses race as the predominant factor in assigning students to school districts',
+      'Engel v. Vitale (1962), because the state is using its public schools to impose a practice that families oppose',
     ],
     correctAnswer: 'A',
     explanation:
@@ -370,9 +370,9 @@ export const govUnit3McqTestQuestions: Question[] = [
       'The Supreme Court ruled in Gitlow v. New York (1925) that the First Amendment applies to state governments. This decision is historically significant because it:',
     image: null,
     options: [
-      'Established that the Bill of Rights was always intended to apply automatically to all levels of government, without any need for the Fourteenth Amendment or selective incorporation',
-      'Granted Congress the authority to pass laws directly regulating state court procedures',
-      'Overturned the precedent set by Brown v. Board of Education regarding state authority',
+      'Established that the Bill of Rights had applied to every level of government from the start, which removed any need for the Fourteenth Amendment or selective incorporation',
+      'Granted Congress new authority under the Fourteenth Amendment to pass laws directly regulating the procedures used in state courts',
+      'Overturned earlier precedent by holding that the Fourteenth Amendment gave state courts final authority over free speech claims',
       "Marked one of the earliest applications of selective incorporation, using the 14th Amendment's Due Process Clause to extend a federal right to the states",
     ],
     correctAnswer: 'D',
@@ -389,10 +389,10 @@ export const govUnit3McqTestQuestions: Question[] = [
     question: 'The Establishment Clause of the First Amendment is interpreted to mean that:',
     image: null,
     options: [
-      'The government may choose one religion as the official state religion.',
-      'All religious institutions are exempt from federal taxation.',
+      'The government may establish an official religion if it tolerates other faiths.',
+      'Religious institutions are exempt from federal taxation by constitutional right.',
       'The government cannot create a national church or favor one religion over another.',
-      'Private schools must adhere to the same curriculum as public schools.',
+      'Private religious schools must follow the same curriculum as public schools.',
     ],
     correctAnswer: 'C',
     explanation:

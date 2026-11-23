@@ -93,6 +93,8 @@ interface Question {
   directionsAfterTable?: string;
   /** Gov unit FRQ pack: optional walkthrough shown on the results screen. */
   walkthroughVideoUrl?: string;
+  /** Rubric points and reader notes, shown as a scoring guide on the results screen. */
+  scoringNotes?: string[];
   parts: Part[];
 }
 
@@ -862,6 +864,22 @@ export function FullExamFRQ({
               </div>
             ))}
         </div>
+        {rq.scoringNotes?.length ? (
+          <details className="group mt-10 rounded-xl border border-slate-200 bg-slate-50/70 open:bg-white">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-gray-900 [&::-webkit-details-marker]:hidden">
+              Scoring guide
+              <ChevronRight className="h-4 w-4 text-gray-400 transition-transform group-open:rotate-90" aria-hidden />
+            </summary>
+            <ul className="space-y-2.5 border-t border-slate-200 px-4 py-4">
+              {rq.scoringNotes.map((note, i) => (
+                <li key={i} className="flex gap-2.5 text-sm leading-relaxed text-gray-700">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gray-400" aria-hidden />
+                  <span>{note}</span>
+                </li>
+              ))}
+            </ul>
+          </details>
+        ) : null}
           </div>
         </div>
         </div>

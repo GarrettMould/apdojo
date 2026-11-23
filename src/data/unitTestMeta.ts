@@ -20,6 +20,9 @@ export const STATS_UNIT_MCQ_SECONDS_PER_QUESTION = 129;
 /** AP Stats full-length Section I: 90 minutes regardless of question count (2027 CED: 42 questions). */
 export const STATS_FULL_MCQ_SECONDS = 90 * 60;
 
+/** AP Gov full-length Section I: 55 questions in 80 minutes. */
+export const GOV_FULL_MCQ_SECONDS = 80 * 60;
+
 /** ceil(87.27s) — AP Gov unit MCQ pacing. */
 export const GOV_UNIT_MCQ_SECONDS_PER_QUESTION = 88;
 

@@ -93,7 +93,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     unitName: 'Political Participation',
     questionGroup: 'u5-stim-federalist-10',
     question:
-      'Questions 5-6 refer to the following excerpt.\n\n"The influence of factious leaders may kindle a flame within their particular States, but will be unable to spread a general conflagration through the other States... A rage for paper money, for an abolition of debts, for an equal division of property, or for any other improper or wicked project, will be less apt to pervade the whole body of the Union than a particular member of it."\n—Publius (Alexander Hamilton), Federalist No. 10, 1787\n\nHow does Madison’s argument in this excerpt address the modern role of interest groups?',
+      'Questions 5-6 refer to the following excerpt.\n\n"The influence of factious leaders may kindle a flame within their particular States, but will be unable to spread a general conflagration through the other States... A rage for paper money, for an abolition of debts, for an equal division of property, or for any other improper or wicked project, will be less apt to pervade the whole body of the Union than a particular member of it."\n—Publius (James Madison), Federalist No. 10, 1787\n\nHow does Madison’s argument in this excerpt address the modern role of interest groups?',
     image: null,
     options: [
       'He argues that interest groups should be banned from political participation, because a large republic cannot control factions and must instead remove the liberty to form them.',
@@ -116,7 +116,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
       'Which of the following modern political phenomena best aligns with Madison’s concern about the "mischiefs of faction" in Federalist No. 10?',
     image: null,
     options: [
-      'The emergence of "Super PACs" that allow interest groups to spend unlimited, undisclosed sums to influence legislative agendas.',
+      'The emergence of "Super PACs" that allow interest groups to spend unlimited sums to influence elections and legislative agendas.',
       'The expansion of the federal bureaucracy to handle increasingly technical regulatory issues.',
       'The decline in the number of third-party candidates appearing on general election ballots.',
       'The increase in bipartisan cooperation on foreign policy initiatives in the Senate.',
@@ -230,7 +230,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     unitName: 'Political Participation',
     questionGroup: 'u5-stim-baker-carr',
     question:
-      'Questions 12-13 refer to the following summary.\n\n*Baker v. Carr* (1961) was a landmark case in which the Supreme Court ruled that federal courts have the authority to intervene in cases of state legislative apportionment. The Court held that redistricting is not merely a "political question" and that malapportioned districts violate the Fourteenth Amendment’s Equal Protection Clause.\n\nThe decision in *Baker v. Carr* directly impacted which of the following political processes?',
+      'Questions 12-13 refer to the following summary.\n\n*Baker v. Carr* (1962) was a landmark case in which the Supreme Court ruled that federal courts have the authority to intervene in cases of state legislative apportionment. The Court held that redistricting is not merely a "political question" and that malapportioned districts violate the Fourteenth Amendment’s Equal Protection Clause.\n\nThe decision in *Baker v. Carr* directly impacted which of the following political processes?',
     image: null,
     options: [
       'The criteria for federal judicial appointments.',
@@ -249,7 +249,7 @@ export const govUnit5McqPracticeQuestions: Question[] = [
     lessonIDS: ['5.1'],
     unitName: 'Political Participation',
     questionGroup: 'u5-concept-shaw-reno',
-    question: 'How does the holding in *Shaw v. Reno* (1993) differ from the decision in *Baker v. Carr* (1961)?',
+    question: 'How does the holding in *Shaw v. Reno* (1993) differ from the decision in *Baker v. Carr* (1962)?',
     image: null,
     options: [
       'It grants state legislatures total freedom to draw districts as they see fit.',

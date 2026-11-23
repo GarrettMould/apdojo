@@ -32,9 +32,9 @@ export const govUnit1McqTestQuestions: Question[] = [
     image: null,
     options: [
       'A large republic that filters public views through elected representatives.',
-      'Creating a direct democracy where every citizen votes on every issue.',
-      'Removing the liberty of citizens to form interest groups.',
-      'Ensuring an equal distribution of property among all citizens.',
+      'A direct democracy in which citizens decide major questions in local assemblies.',
+      'Laws that restrict the liberty of citizens to organize into competing groups.',
+      'A more equal distribution of property, which would reduce conflict among citizens.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -51,8 +51,8 @@ export const govUnit1McqTestQuestions: Question[] = [
     image: null,
     options: [
       'A dangerous grant of power that could lead to the elimination of state sovereignty.',
-      'A necessary tool to prevent states from ignoring federal laws.',
-      'A safeguard for individual liberties through the Bill of Rights.',
+      'A necessary tool for preventing state legislatures from ignoring valid federal laws.',
+      'A useful safeguard that would extend the protections of a bill of rights to citizens.',
       'A means to ensure that the executive branch remained subordinate to the legislature.',
     ],
     correctAnswer: 'A',
@@ -70,7 +70,7 @@ export const govUnit1McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The creation of a unicameral legislature where each state has one vote.',
-      'The expansion of reserved powers to ensure state sovereignty.',
+      'The expansion of reserved powers to protect state sovereignty.',
       'The preservation of the Articles of Confederation with minor amendments.',
       'The strengthening of the central government to address national concerns.',
     ],
@@ -87,10 +87,10 @@ export const govUnit1McqTestQuestions: Question[] = [
     question: 'Which of the following was a direct result of the "Great (Connecticut) Compromise"?',
     image: null,
     options: [
-      'The establishment of a three-branch government.',
-      'The inclusion of a Bill of Rights to protect individual liberties.',
+      'A three-branch government with separate legislative, executive and judicial powers.',
+      'The addition of a Bill of Rights to protect individual liberties from federal power.',
       'A bicameral legislature with different methods of representation in each house.',
-      'The agreement that enslaved persons would count as 60% of a person for representation.',
+      'An agreement to count enslaved persons as three-fifths of a person for representation.',
     ],
     correctAnswer: 'C',
     explanation:
@@ -105,7 +105,12 @@ export const govUnit1McqTestQuestions: Question[] = [
     question:
       'Ambition must be made to counteract ambition. The interest of the man must be connected with the constitutional rights of the place. —Federalist No. 51\n\nThis quote is describing which of the following principles?',
     image: null,
-    options: ['Federalism', 'Popular Sovereignty', 'Separation of Powers and Checks and Balances', 'Judicial Activism'],
+    options: [
+      'Federalism and the Reserved Powers of the States',
+      'Popular Sovereignty and Majority Rule',
+      'Separation of Powers and Checks and Balances',
+      'Judicial Activism and Judicial Supremacy',
+    ],
     correctAnswer: 'C',
     explanation:
       'Madison explains that by dividing power and giving each branch the "ambition" to protect its own area, the system naturally checks itself against tyranny.',
@@ -172,9 +177,9 @@ export const govUnit1McqTestQuestions: Question[] = [
       'Under the Articles of Confederation, the national government faced significant challenges in resolving trade disputes between states because:',
     image: null,
     options: [
-      'The national judiciary frequently overrode state laws.',
-      'The Bill of Rights prevented federal interference in business.',
-      'The executive branch used its veto power to block trade agreements.',
+      'The national judiciary frequently struck down state laws on commerce.',
+      'The Bill of Rights restricted federal interference in business between states.',
+      'The executive branch used its veto power to block interstate trade deals.',
       'The central government lacked the power to regulate interstate commerce.',
     ],
     correctAnswer: 'D',
@@ -228,10 +233,10 @@ export const govUnit1McqTestQuestions: Question[] = [
       alt: 'Line graph of federal outlays to state and local governments over time',
     },
     options: [
-      'Congress passed a constitutional amendment requiring states to fund their own programs.',
+      'Congress passed a constitutional amendment requiring state and local governments to fund their own programs without federal aid.',
       'The federal government prioritized "devolution" and the use of block grants to reduce federal fiscal responsibility and discretion for state spending.',
-      'The federal government expanded categorical grant funding as part of a strategy to increase national control.',
-      'The Supreme Court ruled that all forms of intergovernmental transfers were unconstitutional under the Tenth Amendment.',
+      'The federal government expanded categorical grant funding as part of a strategy to increase national control over how states spent their money.',
+      'The Supreme Court ruled that most intergovernmental transfers were unconstitutional under the Tenth Amendment, which forced Congress to cut aid.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -251,10 +256,10 @@ export const govUnit1McqTestQuestions: Question[] = [
       alt: 'Line graph of federal outlays to state and local governments over time',
     },
     options: [
-      'The federal government has steadily decreased its fiscal influence over state and local governments since 1950.',
+      'The federal government has gradually reduced its fiscal influence over state and local governments, reflecting a steady shift toward devolution.',
       'The federal government has increasingly utilized fiscal transfers to state and local governments, reflecting the expansion of cooperative federalism.',
       'The trend indicates a return to the era of dual federalism, where the national government and states operate in separate, non-overlapping spheres.',
-      'Federal outlays to states have remained stagnant, demonstrating that the scope of the federal government has not expanded since the 1940s.',
+      'Federal outlays to states have remained largely flat, suggesting that the scope of the federal government has not grown meaningfully since the 1940s.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -288,10 +293,10 @@ export const govUnit1McqTestQuestions: Question[] = [
     question: 'Federalism increases "access points" for interest groups because:',
     image: null,
     options: [
-      'It consolidates all policymaking into one location.',
-      'It ensures that only elite groups can influence the government.',
+      'It concentrates policymaking authority within the national government.',
+      'It tends to limit lobbying to elite groups with national reach.',
       'It allows groups to lobby at the local, state, and national levels.',
-      'It requires interest groups to be non-partisan.',
+      'It requires interest groups to register as non-partisan at each level.',
     ],
     correctAnswer: 'C',
     explanation:
@@ -312,9 +317,9 @@ export const govUnit1McqTestQuestions: Question[] = [
     },
     options: [
       'A key structural difference between state and federal governments, in which states face fiscal constraints that limit deficit spending unlike the national government',
-      'The Supremacy Clause, because federal budget law overrides state balanced budget requirements and forces states to run deficits whenever the national government does',
-      'Dual federalism, because states and the federal government operate under completely identical fiscal rules',
-      'Cooperative federalism, because states and the federal government share responsibility for balancing the national budget',
+      'The Supremacy Clause, because federal budget law overrides state balanced budget requirements and requires states to run deficits whenever Congress does',
+      'Dual federalism, because states and the federal government operate in separate spheres under identical rules for balancing their budgets',
+      'Cooperative federalism, because states and the federal government share responsibility for balancing the national budget through joint fiscal planning',
     ],
     correctAnswer: 'A',
     explanation:
@@ -335,9 +340,9 @@ export const govUnit1McqTestQuestions: Question[] = [
     },
     options: [
       'Congress must pass the amendment by a two-thirds vote in both chambers, followed by ratification by three-fourths of the states',
-      'The president must sign an executive order directing the Treasury to balance the budget each fiscal year',
-      'The Supreme Court must first rule that deficit spending is unconstitutional before Congress can act',
-      'A simple majority vote in both chambers of Congress is sufficient to amend the Constitution',
+      'The president must issue an executive order directing the Treasury to balance the budget each fiscal year, with Senate approval',
+      'The Supreme Court must first rule that deficit spending is unconstitutional, after which Congress may adopt the new requirement by statute',
+      'Congress must approve the amendment by a simple majority in both chambers, after which it takes effect without action by the states',
     ],
     correctAnswer: 'A',
     explanation:

@@ -37,6 +37,8 @@ export interface GovStimulusFrq {
   cedLink?: string;
   /** Sample responses per part — optional until keys are authored for each pack. */
   answerKey?: GovFrqAnswerKey;
+  /** Rubric points and reader notes, shown as a scoring guide on the results screen. */
+  scoringNotes?: string[];
 }
 
 const GOV_FRQ_ANSWER_KEY_PARTS = ['partA', 'partB', 'partC', 'partD'] as const;
@@ -437,80 +439,83 @@ export function getGovUnitFrqFormatLabels(unitNumber: number): string[] {
   });
 }
 
-/** Shape expected by `FullExamFRQ` — one combined exam document for the unit pack. */
-export function buildGovUnitFrqPackForFullExam(unitNumber: number): {
-  examTitle: string;
-  questions: Array<{
-    questionNumber: number;
-    /** FRQ title line (e.g. “FRQ 3: …”). Shown above stimulus when set. */
-    questionTitle?: string;
-    prompt: string;
-    govScotusStimulus?: {
-      instructions: string;
-      caseCitation: string;
-      summary: string;
-    };
-    tableData?: GovFrqTableData;
-    directionsAfterTable?: string;
-    image?: { src: string; alt: string };
-    walkthroughVideoUrl?: string;
-    parts: Array<{ label: string; text: string; answerType: 'text'; answer?: string }>;
-  }>;
-} | null {
-  const pack = getGovUnitStimulusFrqs(unitNumber);
-  if (pack.length === 0) return null;
+/** One question in the shape `FullExamFRQ` expects. */
+export interface GovFullExamFrqQuestion {
+  questionNumber: number;
+  /** FRQ title line (e.g. “FRQ 3: …”). Shown above stimulus when set. */
+  questionTitle?: string;
+  prompt: string;
+  govScotusStimulus?: {
+    instructions: string;
+    caseCitation: string;
+    summary: string;
+  };
+  tableData?: GovFrqTableData;
+  directionsAfterTable?: string;
+  image?: { src: string; alt: string };
+  walkthroughVideoUrl?: string;
+  scoringNotes?: string[];
+  parts: Array<{ label: string; text: string; answerType: 'text'; answer?: string }>;
+}
+
+/** Converts Gov stimulus FRQs into one `FullExamFRQ` document (unit packs and the full exam). */
+export function buildGovFrqExamDocument(
+  examTitle: string,
+  frqs: GovStimulusFrq[],
+  walkthroughFor?: (questionNumber: number) => string | undefined,
+): { examTitle: string; questions: GovFullExamFrqQuestion[] } {
   return {
-    examTitle: `AP Gov Unit ${unitNumber} FRQ Pack (${pack.length} Questions)`,
-    questions: pack.map((frq, idx) => {
+    examTitle,
+    questions: frqs.map((frq, idx): GovFullExamFrqQuestion => {
       const questionNumber = idx + 1;
-      const walkthroughVideoUrl = getGovFrqWalkthroughVideoUrl(unitNumber, questionNumber);
+      const walkthroughVideoUrl = walkthroughFor?.(questionNumber);
+      const common = {
+        questionNumber,
+        questionTitle: frq.title,
+        walkthroughVideoUrl,
+        ...(frq.scoringNotes?.length ? { scoringNotes: frq.scoringNotes } : {}),
+        parts: mapGovFrqTasksToParts(frq),
+      };
 
       if (frq.tableData) {
         return {
-          questionNumber,
-          questionTitle: frq.title,
+          ...common,
           prompt: '',
           tableData: frq.tableData,
           directionsAfterTable: frq.prompt.trim() || undefined,
-          walkthroughVideoUrl,
-          parts: mapGovFrqTasksToParts(frq),
         };
       }
       if (frq.scotusCaseCitation && frq.stimulus) {
         return {
-          questionNumber,
-          questionTitle: frq.title,
+          ...common,
           prompt: frq.prompt?.trim() ?? '',
-          walkthroughVideoUrl,
           govScotusStimulus: {
             instructions: GOV_SCOTUS_COMPARISON_INSTRUCTIONS,
             caseCitation: frq.scotusCaseCitation,
             summary: frq.stimulus,
           },
-          parts: mapGovFrqTasksToParts(frq),
         };
       }
       const image = govFrqImageForPack(frq);
+      // Chart questions may also carry stimulus text (title, source, notes) shown with the prompt.
+      const prompt = frq.stimulus ? `${frq.stimulus.trim()}\n\n${frq.prompt.trim()}`.trim() : frq.prompt.trim();
       if (frq.image) {
-        return {
-          questionNumber,
-          questionTitle: frq.title,
-          prompt: frq.prompt.trim(),
-          ...(image ? { image } : {}),
-          walkthroughVideoUrl,
-          parts: mapGovFrqTasksToParts(frq),
-        };
+        return { ...common, prompt, ...(image ? { image } : {}) };
       }
-      return {
-        questionNumber,
-        questionTitle: frq.title,
-        prompt: frq.stimulus
-          ? `${frq.stimulus.trim()}\n\n${frq.prompt.trim()}`.trim()
-          : frq.prompt.trim(),
-        walkthroughVideoUrl,
-        parts: mapGovFrqTasksToParts(frq),
-      };
+      return { ...common, prompt };
     }),
   };
 }
 
+/** Shape expected by `FullExamFRQ` — one combined exam document for the unit pack. */
+export function buildGovUnitFrqPackForFullExam(
+  unitNumber: number,
+): { examTitle: string; questions: GovFullExamFrqQuestion[] } | null {
+  const pack = getGovUnitStimulusFrqs(unitNumber);
+  if (pack.length === 0) return null;
+  return buildGovFrqExamDocument(
+    `AP Gov Unit ${unitNumber} FRQ Pack (${pack.length} Questions)`,
+    pack,
+    (questionNumber) => getGovFrqWalkthroughVideoUrl(unitNumber, questionNumber),
+  );
+}

@@ -603,7 +603,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     options: [
       'Marbury v. Madison (1803)',
       'McCulloch v. Maryland (1819)',
-      'Baker v. Carr (1961)',
+      'Baker v. Carr (1962)',
       'Shaw v. Reno (1993)',
     ],
     correctAnswer: 'B',
@@ -642,7 +642,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     image: null,
     options: [
       'Shaw v. Reno (1993)',
-      'Baker v. Carr (1961)',
+      'Baker v. Carr (1962)',
       'Brown v. Board of Education (1954)',
       'Citizens United v. FEC (2010)',
     ],
@@ -658,7 +658,7 @@ export const govUnit2McqPracticeQuestions: Question[] = [
     unitName: 'Interactions Among Branches of Government',
     questionGroup: 'u2-concept-baker-carr-holding',
     question:
-      'Which of the following best summarizes the core legal holding of Baker v. Carr (1961)?',
+      'Which of the following best summarizes the core legal holding of Baker v. Carr (1962)?',
     image: null,
     options: [
       'Districts drawn with bizarre shapes solely to separate voters based on race violate the Fifteenth Amendment.',

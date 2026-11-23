@@ -7,6 +7,9 @@ export const FEATURES = {
   statsFullMcqExam: true,
   /** AP Stats Full FRQ Exam 1 (/ap-stats-frq-practice-test-1). */
   statsFullFrqExam: true,
+  /** AP Gov Full MCQ Exam 1 (/ap-gov-mcq-practice-test-1). */
+  govFullMcqExam: true,
+  govFullFrqExam: true,
   /** 1-on-1 tutoring page (/tutoring) and its nav, footer and purchase-page links. */
   tutoring: true,
   /**

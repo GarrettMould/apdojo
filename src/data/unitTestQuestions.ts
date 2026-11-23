@@ -98,7 +98,6 @@ export const unitTestQuestions: QuestionType[] = [
     ],
     "correctAnswer": "D",
     "explanation": "When the price of coffee increases, consumers will likely substitute tea for coffee, causing an increase in the demand for tea. This is a classic example of the substitution effect in consumer behavior.",
-    explanationVideo: "https://apdojovideos.s3.ap-southeast-2.amazonaws.com/Unit_MCQ_Explanations/U1Q5.mp4"
   },
   {
     "id": 1005,
@@ -516,10 +515,10 @@ export const unitTestQuestions: QuestionType[] = [
       "685 billion",
       "760 billion",
       "750 billion",
-      "625 billion",
-      "600 billion"
+      "600 billion",
+      "625 billion"
     ],
-    correctAnswer: "D"
+    correctAnswer: "E"
   }, 
   {
     id: 1027,
@@ -2199,10 +2198,10 @@ options: [
     image: null,
     options: [
       "Because the monopolist must lower the price on all previous units to sell an additional unit.",
-      "Because the monopolist has no control over the market price.",
-      "Because the monopolist experiences diseconomies of scale.",
-      "Because the demand curve is perfectly elastic.",
-      "Because the monopolist taxes the consumers."
+      "Because the monopolist is a price taker and must accept the price set by the market.",
+      "Because diseconomies of scale raise the cost of each additional unit the monopolist produces and sells.",
+      "Because the demand curve facing the monopolist is perfectly elastic at the current price.",
+      "Because the monopolist must pay a per-unit tax on each additional unit that it sells."
     ],
     correctAnswer: "A",
     explanation: "To sell one more unit, a monopoly must lower the price. However, they cannot just lower the price for that one new buyer; they must lower the price for all units sold (assuming they cannot price discriminate). This loss of revenue on the previous units pulls the marginal revenue below the price of the new unit.",
@@ -2475,11 +2474,11 @@ options: [
     question: "Cartels are often unstable in the long run because:",
     image: null,
     options: [
-      "It is illegal to raise prices.",
+      "Firms in a cartel are legally prohibited from raising prices above their marginal costs.",
       "Individual members have an incentive to cheat by increasing output to capture more profit.",
-      "The market demand curve becomes perfectly inelastic.",
-      "New firms cannot enter the market.",
-      "They automatically achieve allocative efficiency."
+      "The market demand curve becomes perfectly inelastic once the cartel restricts its output.",
+      "Barriers to entry prevent new firms from joining the cartel and sharing its higher profits.",
+      "Cartels automatically achieve allocative efficiency, which eliminates their economic profit over time."
     ],
     correctAnswer: "B",
     explanation: "While the cartel as a group maximizes profit by restricting output, an individual member can earn even more profit by secretly increasing their own production while the others hold back. If every member acts on this incentive to cheat, the cartel collapses.",
@@ -2759,11 +2758,11 @@ options: [
     question: "Why does the Marginal Resource Cost (MRC) curve lie above the labor supply curve for a monopsonist?",
     image: null,
     options: [
-      "Because the firm can price discriminate and pay different wages to different workers.",
-      "Because the supply of labor is perfectly elastic.",
-      "Because the firm hires labor in a perfectly competitive market.",
+      "Because the firm can pay each worker a different wage, so hiring one more worker does not affect what the others earn.",
+      "Because the supply of labor to the firm is perfectly elastic, so the firm can hire more workers at the going market wage.",
+      "Because the firm hires labor in a perfectly competitive market, where each worker is paid the value of marginal product.",
       "Because to hire an additional worker, the firm must raise the wage for that worker and all currently employed workers.",
-      "Because the marginal product of labor is diminishing."
+      "Because the marginal product of labor is diminishing, so each additional worker adds less output than the worker before."
     ],
     correctAnswer: "D",
     explanation: "A monopsony is the sole buyer of labor and faces the upward-sloping market supply curve. To attract one more worker, it must offer a higher wage. However, it cannot pay the new worker more than the existing workers (assuming no discrimination), so it must raise the wage for *everyone*. This extra cost makes the marginal cost of hiring the next worker higher than the wage paid to that worker.",

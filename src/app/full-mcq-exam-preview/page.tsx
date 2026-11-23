@@ -10,7 +10,7 @@ import {
   getFullMCQExamTestId,
   getFullMCQTestUrl,
 } from '@/lib/utils';
-import { STATS_FULL_MCQ_SECONDS } from '@/data/unitTestMeta';
+import { GOV_FULL_MCQ_SECONDS, STATS_FULL_MCQ_SECONDS } from '@/data/unitTestMeta';
 import { STATS_FULL_MCQ_EXAM_1_IDS } from '@/data/stats/statsFullMcqExam1Ids';
 import { FEATURES } from '@/lib/featureFlags';
 
@@ -28,7 +28,7 @@ const TOOLS = [
   { icon: <PauseCircle className="w-4 h-4" />, label: 'Pause Test', desc: 'Pause the timer at any time' },
 ];
 
-type FullMcqSubject = 'macro' | 'micro' | 'stats';
+type FullMcqSubject = 'macro' | 'micro' | 'stats' | 'gov';
 
 const EXAM_INFO: Record<FullMcqSubject, { name: string; accentBg: string; badge: string; questions: number; minutes: number }> = {
   macro: { name: 'Macroeconomics', accentBg: 'bg-blue-600', badge: 'bg-blue-50 text-blue-700', questions: 60, minutes: 70 },
@@ -41,6 +41,13 @@ const EXAM_INFO: Record<FullMcqSubject, { name: string; accentBg: string; badge:
     questions: STATS_FULL_MCQ_EXAM_1_IDS.length,
     minutes: STATS_FULL_MCQ_SECONDS / 60,
   },
+  gov: {
+    name: 'U.S. Government and Politics',
+    accentBg: 'bg-violet-600',
+    badge: 'bg-violet-50 text-violet-700',
+    questions: 55,
+    minutes: GOV_FULL_MCQ_SECONDS / 60,
+  },
 };
 
 function FullMCQExamPreviewContent() {
@@ -49,8 +56,10 @@ function FullMCQExamPreviewContent() {
   const { user } = useAuthContext();
 
   const subjectParam = searchParams.get('subject');
-  const subject: FullMcqSubject = subjectParam === 'micro' || subjectParam === 'stats' ? subjectParam : 'macro';
+  const subject: FullMcqSubject =
+    subjectParam === 'micro' || subjectParam === 'stats' || subjectParam === 'gov' ? subjectParam : 'macro';
   if (subject === 'stats' && !FEATURES.statsFullMcqExam) notFound();
+  if (subject === 'gov' && !FEATURES.govFullMcqExam) notFound();
   const examNum = parseInt(searchParams.get('num') || '1');
 
   const { name: subjectName, accentBg, badge, questions: TOTAL_QUESTIONS, minutes } = EXAM_INFO[subject];

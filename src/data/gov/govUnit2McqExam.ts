@@ -18,10 +18,10 @@ export const govUnit2McqTestQuestions: Question[] = [
       'The Senate is designed to represent states equally, while the House is designed to represent the people... All House members are elected every two years, whereas one-third of the Senate is elected every two years.\n\nWhich of the following constitutional design choices best explains this structural difference between the chambers?',
     image: null,
     options: [
-      'The framers intended the House to be insulated from rapid shifts in public opinion, while the Senate acts as a direct mirror of democracy.',
-      'The structure reflects a compromise where the executive branch can easily control the House but cannot influence the Senate.',
+      'The House was designed to be insulated from rapid shifts in public opinion, while the Senate was intended to act as a direct and immediate mirror of the electorate.',
+      'The difference reflects a compromise in which the executive branch may exert more influence over the House than it can over the smaller and more independent Senate.',
       'The House was intended to be more responsive to the immediate passions of the electorate, while the Senate serves as a more deliberate and continuous body.',
-      'The Senate was created with short terms to encourage frequent rotation in office, preventing elite control.',
+      'The Senate was given shorter effective terms through staggered elections to encourage frequent rotation in office and prevent elite control of the chamber over time.',
     ],
     correctAnswer: 'C',
     explanation:
@@ -56,9 +56,9 @@ export const govUnit2McqTestQuestions: Question[] = [
       'The federal budget consists of both mandatory and discretionary spending. As spending on entitlement programs like Social Security and Medicare automatically grows due to demographic changes, which of the following is a long-term economic consequence for federal budgeting?',
     image: null,
     options: [
-      'Interest groups will reduce lobbying efforts on discretionary spending due to constitutional constraints.',
-      'Congress must pass a completely new authorization act annually to keep mandatory spending active.',
-      'The federal government will automatically eliminate its budget deficit by balancing national priorities.',
+      'Interest groups will likely reduce their lobbying on discretionary spending because of new constitutional constraints.',
+      'Congress will need to pass a new authorization act each year to keep mandatory spending programs in effect for the next fiscal year.',
+      'The federal budget deficit will tend to shrink automatically as spending shifts toward long-term national priorities.',
       'Discretionary spending opportunities will decrease unless tax revenues increase or the budget deficit increases.',
     ],
     correctAnswer: 'D',
@@ -90,9 +90,9 @@ export const govUnit2McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The President is a Democrat, while the Republican party controls at least one chamber of Congress.',
-      'The Democratic party holds a unified majority in both the House of Representatives and the Senate while working under a Democratic president.',
-      'A legislative gridlock occurs because the Supreme Court strikes down executive orders from a lame-duck president.',
-      'Members of a single political party split their votes along regional, ideological lines during a budget confirmation.'
+      'The Democratic party controls both the House and the Senate while a Democratic president is in office.',
+      'Legislation stalls because the Supreme Court strikes down executive orders from a lame-duck president.',
+      'Members of one party split their votes along regional lines during a budget debate.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -112,10 +112,10 @@ export const govUnit2McqTestQuestions: Question[] = [
       alt: 'Map showing congressional district competitiveness across the United States',
     },
     options: [
-      'Voter turnout is equally distributed across all states regardless of district competitiveness.',
+      'Voter turnout tends to be distributed evenly across states regardless of how competitive their congressional districts are.',
       'The winner-take-all system combined with partisan gerrymandering produces safe districts that reduce electoral accountability for most incumbents.',
-      'The Constitution requires that congressional districts be drawn to maximize competition between the two major parties.',
-      'Uncompetitive districts are primarily the result of low voter registration rates in rural areas.',
+      'The Constitution requires states to draw congressional districts that maximize competition between the two major parties in each election.',
+      'Uncompetitive districts result primarily from low voter registration rates in rural areas, which leave incumbents with little organized opposition in most elections.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -129,16 +129,16 @@ export const govUnit2McqTestQuestions: Question[] = [
     unitName: 'Interactions Among Branches of Government',
     questionGroup: 'u2-stim-district-map',
     question:
-      'If a state\'s congressional map is challenged on the grounds that it was drawn primarily to favor one party, which of the following Supreme Court cases would be most relevant to the judicial review process?',
+      'If a state\'s congressional map is challenged on the grounds that its districts have significantly unequal populations, which of the following Supreme Court cases would be most relevant to whether federal courts can hear the challenge?',
     image: {
       src: 'https://apdojowhiteboards.s3.ap-southeast-2.amazonaws.com/unitTestImages/gov/unit_2/congressional+district+competitiveness.svg',
       alt: 'Map showing congressional district competitiveness across the United States',
     },
     options: [
-      'Baker v. Carr (1961), because it established the "one person, one vote" principle and allowed federal courts to intervene in redistricting.',
-      'Marbury v. Madison (1803), because it established the Court\'s power to hear election disputes.',
-      'McCulloch v. Maryland (1819), because it dealt with the implied powers of the federal government over states.',
-      'United States v. Lopez (1995), because it limited Congress\'s authority to regulate local activities.',
+      'Baker v. Carr (1962), because it held that challenges to legislative apportionment are justiciable, allowing federal courts to hear such cases.',
+      "Marbury v. Madison (1803), because it established the Court's authority to review election disputes arising under state redistricting law.",
+      'McCulloch v. Maryland (1819), because it addressed the implied powers of the federal government over how states exercise their authority.',
+      "United States v. Lopez (1995), because it limited Congress's authority to regulate activities that states traditionally control.",
     ],
     correctAnswer: 'A',
     explanation:
@@ -155,9 +155,9 @@ export const govUnit2McqTestQuestions: Question[] = [
     image: null,
     options: [
       'Issuing an executive agreement with a foreign ally to secure immediate military cooperation.',
-      'Negotiating a formal treaty with a foreign nation requiring a two-thirds Senate vote.',
-      'Vetoing a major defense appropriations bill passed by Congress.',
-      'Nominating an ambassador to serve as the chief diplomatic envoy to the United Nations.',
+      'Negotiating a formal treaty with a foreign nation, which requires a two-thirds vote of the Senate.',
+      'Vetoing a major defense appropriations bill that Congress has sent to the President for signature.',
+      "Nominating an ambassador to serve as the nation's chief diplomatic envoy to the United Nations.",
     ],
     correctAnswer: 'A',
     explanation:
@@ -173,9 +173,9 @@ export const govUnit2McqTestQuestions: Question[] = [
       'The President has issued a controversial executive order to divert pre-allocated infrastructure funds toward building national border defense barriers. Congress strongly opposes this initiative. Which of the following constitutional actions can Congress take to check this expansion of executive power?',
     image: null,
     options: [
-      'The Senate can vote by simple majority to instantly declare the executive order null and void.',
-      'Congress can appeal to the Electoral College to adjust the administration\'s policy jurisdiction.',
-      'The House of Representatives can force the President to submit the order for legislative veto evaluation.',
+      'The Senate can vote by simple majority to declare the executive order null and void, which ends the program without further action.',
+      "Congress can petition the Electoral College to review the order and adjust the limits of the administration's policy jurisdiction.",
+      'The House of Representatives can require the President to submit the order for a legislative veto before any funds can be spent.',
       'Congress can use its power of the purse to pass legislation explicitly withholding or blocking appropriations for the defense barriers.',
     ],
     correctAnswer: 'D',
@@ -211,10 +211,10 @@ export const govUnit2McqTestQuestions: Question[] = [
       'A modern president utilizes an unannounced, nationwide live-streamed video address on social media platforms to urge citizens to call their senators and demand a vote on a stalled healthcare bill. This communication strategy leverages which of the following political concepts?',
     image: null,
     options: [
-      'The exercise of formal judicial review authority',
-      'An invocation of the advice and consent clause',
+      'The exercise of formal judicial review authority over pending legislation',
+      "An invocation of the Senate's advice and consent clause to force a vote",
       'The use of the presidential bully pulpit to set the political agenda',
-      'The application of retrospective constituent delegation',
+      'The application of the delegate model of representation to the electorate',
     ],
     correctAnswer: 'C',
     explanation:
@@ -250,9 +250,9 @@ export const govUnit2McqTestQuestions: Question[] = [
     image: null,
     options: [
       'How Congress can attempt to place structural checks or jurisdictional limits on the judicial branch',
-      'The use of statutory exemptions to remove life tenure from federal justices',
-      'An application of executive supremacy over judicial interpretation',
-      'The mandatory function of compliance monitoring under iron triangle systems',
+      'The use of statutory exemptions to strip life tenure from sitting federal justices on the Court',
+      "An application of executive supremacy over the Court's interpretation of federal statutes",
+      'The required compliance monitoring that committees perform under iron triangle relationships',
     ],
     correctAnswer: 'A',
     explanation:
@@ -269,9 +269,9 @@ export const govUnit2McqTestQuestions: Question[] = [
     image: null,
     options: [
       'A bureaucratic agency, a congressional committee, and an interest group collaborate over time to create and protect industry-specific policy regulations.',
-      'The President, the Prime Minister of a foreign nation, and the Secretary of State draft an alliance.',
-      'The Supreme Court, the House of Representatives, and state governors negotiate a constitutional amendment.',
-      'A temporary alliance of multi-industry journalists and academic scientists forms to raise awareness about public health issues.',
+      'The President, the Prime Minister of a foreign nation, and the Secretary of State work together over time to draft and maintain a long-term security alliance.',
+      'The Supreme Court, the House of Representatives, and state governors negotiate over time to draft and ratify a constitutional amendment on industry regulation.',
+      'A temporary coalition of journalists and academic scientists from several industries forms to raise public awareness about emerging health issues.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -306,10 +306,10 @@ export const govUnit2McqTestQuestions: Question[] = [
       'The complex architecture of the federal government—characterized by a separation of powers and checks and balances among three branches—impacts policymaking by creating which of the following systemic results?',
     image: null,
     options: [
-      'It centralizes all public access points into the office of the executive branch.',
+      'It tends to centralize public access points in the executive branch, which limits the influence of other stakeholders on policy.',
       'It creates multiple access points for stakeholders to influence public policy, while introducing constraints on national policymaking.',
-      'It guarantees that the political party controlling the presidency can bypass legislative oversight completely.',
-      'It forces the federal bureaucracy to bypass judicial review by operating entirely through patronage systems.',
+      'It allows the party controlling the presidency to bypass legislative oversight, which speeds passage of national policy priorities.',
+      'It encourages the federal bureaucracy to avoid judicial review by operating mainly through patronage rather than merit hiring.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -329,10 +329,10 @@ export const govUnit2McqTestQuestions: Question[] = [
       alt: 'Chart showing the number of presidential vetoes by decade from the 1980s through the 2020s',
     },
     options: [
-      'The decline in vetoes from the 1980s to the 2020s indicates that Presidents have increasingly lost the constitutional authority to check the legislative branch.',
-      'A low number of vetoes suggests a high degree of legislative-executive cooperation, meaning the President and Congress have always shared the same policy priorities.',
+      'The decline in vetoes from the 1980s to the 2020s indicates that Presidents have gradually lost the constitutional authority to check the legislative branch through the formal veto process.',
+      'A low number of vetoes suggests a high degree of legislative-executive cooperation, meaning that Presidents and Congress have usually held the same policy priorities since the 1980s, regardless of party.',
       'Presidents may rely on the "veto threat" as a tool of informal power to influence the legislative process before a bill even reaches their desk, potentially reducing the need for formal vetoes.',
-      'The data demonstrates that the use of the veto is a primary power used to bypass the Supreme Court\'s exercise of judicial review.',
+      "The data demonstrates that the veto may serve as a primary tool for Presidents seeking to bypass the Supreme Court's exercise of judicial review over acts of Congress.",
     ],
     correctAnswer: 'C',
     explanation:
@@ -352,9 +352,9 @@ export const govUnit2McqTestQuestions: Question[] = [
       alt: 'Chart showing the number of presidential vetoes by decade from the 1980s through the 2020s',
     },
     options: [
-      'Modern Presidents have been granted significantly more formal authority by Congress to rewrite laws, reducing the need for formal vetoes.',
-      'Recent Presidents are less likely to face opposition from Congress due to a decrease in party polarization.',
-      'The Constitution has been amended to restrict the President\'s ability to issue regular vetoes, resulting in the drastic decline seen in the 21st century.',
+      'Modern Presidents have been granted significantly more formal authority by Congress to rewrite enacted laws on their own, which has reduced their need to rely on the formal veto power during negotiations.',
+      'Recent Presidents are less likely to face opposition from Congress because party polarization has declined, allowing more bills to reach them in a form they are willing to sign.',
+      "The Constitution has been amended to restrict the President's ability to issue regular vetoes, which accounts for the sharp decline in their use during the twenty-first century.",
       'Presidents in the modern era are more likely to utilize executive orders and other unilateral actions to shape policy, rather than relying on the legislative process where vetoes occur.',
     ],
     correctAnswer: 'D',

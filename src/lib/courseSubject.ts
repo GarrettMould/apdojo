@@ -132,14 +132,24 @@ export function isEconCourse(subject: CourseSubject): boolean {
   return subject === 'macro' || subject === 'micro';
 }
 
-/** Courses with a full-length MCQ exam (`/ap-{subject}-mcq-practice-test-1`). Gov's is not posted yet. */
+/** Courses with a full-length MCQ exam (`/ap-{subject}-mcq-practice-test-1`). */
 export function hasFullMcqExam(subject: CourseSubject): boolean {
-  return subject === 'macro' || subject === 'micro' || (subject === 'stats' && FEATURES.statsFullMcqExam);
+  return (
+    subject === 'macro' ||
+    subject === 'micro' ||
+    (subject === 'stats' && FEATURES.statsFullMcqExam) ||
+    (subject === 'gov' && FEATURES.govFullMcqExam)
+  );
 }
 
 /** Courses with a full-length FRQ exam (`/ap-{subject}-frq-practice-test-N`). */
 export function hasFullFrqExam(subject: CourseSubject): boolean {
-  return subject === 'macro' || subject === 'micro' || (subject === 'stats' && FEATURES.statsFullFrqExam);
+  return (
+    subject === 'macro' ||
+    subject === 'micro' ||
+    (subject === 'stats' && FEATURES.statsFullFrqExam) ||
+    (subject === 'gov' && FEATURES.govFullFrqExam)
+  );
 }
 
 /** First unit cheat sheet URL for the course (pretty route). */

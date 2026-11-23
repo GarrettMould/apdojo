@@ -115,7 +115,7 @@ export const scotusEssayPrompts: ScotusEssayPrompt[] = [
   {
     id: 'baker-v-carr',
     topic: 'Redistricting & Malapportionment',
-    requiredCase: 'Baker v. Carr (1961)',
+    requiredCase: 'Baker v. Carr (1962)',
     nonRequiredCase: 'Reynolds v. Sims (1964)',
     scenario:
       'In Alabama, legislative districts had not been updated for over 60 years, despite massive population shifts from rural to urban areas. This resulted in rural districts with a small number of voters having the same representation as urban districts with vastly more people. Residents sued, arguing this violated the Equal Protection Clause. The Supreme Court ruled that districts must be apportioned on a population basis, establishing the "one person, one vote" standard for state legislative districts.',

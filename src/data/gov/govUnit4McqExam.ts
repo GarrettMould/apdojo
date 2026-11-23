@@ -19,10 +19,10 @@ export const govUnit4McqTestQuestions: Question[] = [
       'A citizen believes that while the government should ensure a basic safety net, the primary responsibility for economic success lies with the individual’s own ambition and effort. This citizen’s belief system most closely aligns with:',
     image: null,
     options: [
-      'The principle of equality of result.',
-      'A preference for a command economy.',
+      'The principle of equality of result over individual effort.',
+      'A preference for a command economy over private enterprise.',
       'The tension between individualism and the role of the state.',
-      'The principle of rule of law over individual property rights.',
+      'The principle of rule of law over property rights.',
     ],
     correctAnswer: 'C',
     explanation:
@@ -39,9 +39,9 @@ export const govUnit4McqTestQuestions: Question[] = [
       'A news organization conducts a poll by calling landline telephones during business hours to ask about support for a new tax policy. Which of the following best explains a potential limitation of this data?',
     image: null,
     options: [
-      'Benchmark polls are inherently more accurate than tracking polls.',
-      'The poll lacks a margin of error calculation.',
-      'The question is neutral and unbiased, making the data highly credible.',
+      'Benchmark polls tend to be more accurate than tracking polls conducted during a campaign.',
+      'The poll likely lacks a margin of error because it was conducted by telephone.',
+      'The results are likely to be highly credible because telephone polls reach a neutral sample.',
       'The sample is likely to suffer from non-response bias and underrepresent younger voters.',
     ],
     correctAnswer: 'D',
@@ -59,9 +59,9 @@ export const govUnit4McqTestQuestions: Question[] = [
       'Which of the following scenarios best illustrates the "generational effect" on political socialization?',
     image: null,
     options: [
-      'A person’s political views shift to the right as they enter retirement, which is a life-cycle change rather than a generational pattern that stays stable over a lifetime.',
-      'A voter changing their stance on an issue due to a specific scandal involving a single candidate.',
-      'A student changing their party identification after taking a college course.',
+      'A person’s political views shift to the right after entering retirement, as concerns about taxes and fixed incomes become more important with age.',
+      'A voter changes position on several issues after a scandal involving a single candidate dominates the news during one election cycle.',
+      'A student changes party identification after taking a college course that challenges the political views learned at home.',
       'A group of voters who came of age during the Great Depression consistently favoring a larger federal role in the economy throughout their lives.',
     ],
     correctAnswer: 'D',
@@ -78,10 +78,10 @@ export const govUnit4McqTestQuestions: Question[] = [
     question: 'Which of the following policy positions would a modern American libertarian most likely support?',
     image: null,
     options: [
-      'Stricter government regulations on the private sale of property.',
+      'Stricter government regulation of how private owners may buy, sell, and develop their property.',
       'The legalization of most personal behaviors provided they do not infringe on the rights of others.',
-      'Nationalized healthcare administered by the federal government.',
-      'Increased federal spending on public education at the state level.',
+      'A nationalized healthcare system administered and financed by the federal government.',
+      'Increased federal spending on public education, with new national standards for states to follow.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -112,7 +112,7 @@ export const govUnit4McqTestQuestions: Question[] = [
     question:
       'Questions 6-7 refer to the following summary.\n\nThe Democratic Party platform traditionally emphasizes a "social safety net," advocating for government-funded programs to support the vulnerable. In contrast, the Republican Party platform typically prioritizes "free enterprise," arguing that lower taxes and deregulation drive economic growth more effectively than government spending.\n\nWhich of the following political ideologies is best represented by the Republican Party’s position in this excerpt?',
     image: null,
-    options: ['Liberalism', 'Conservatism', 'Socialism', 'Populism'],
+    options: ['Liberalism', 'Conservatism', 'Democratic socialism', 'Populism'],
     correctAnswer: 'B',
     explanation:
       'Modern American conservatism typically champions lower taxes, deregulation, and a reduced government role in the marketplace to foster private sector growth.',
@@ -128,10 +128,10 @@ export const govUnit4McqTestQuestions: Question[] = [
       'Which of the following economic approaches would a supporter of the Democratic Party’s position described in the excerpt most likely favor?',
     image: null,
     options: [
-      'Strict adherence to Laissez-faire capitalism.',
+      'Laissez-faire economic theory.',
       'Supply-side economic theory.',
       'Keynesian economic theory.',
-      'The elimination of all progressive tax brackets.',
+      'Monetarist economic theory.',
     ],
     correctAnswer: 'C',
     explanation:
@@ -148,9 +148,9 @@ export const govUnit4McqTestQuestions: Question[] = [
       'A campaign manager wants to ensure that a poll’s results are credible and minimize the margin of error. Which of the following is most essential?',
     image: null,
     options: [
-      'Ensuring the poll reaches at least 50% of the entire population.',
-      'Using biased, leading questions to reveal the "true" intent of the respondent.',
-      'Conducting the poll exclusively via social media to reach younger voters.',
+      'Ensuring that the poll reaches at least half of all adults living in the area being surveyed.',
+      'Using carefully worded leading questions to reveal how respondents truly feel about each candidate.',
+      'Conducting the poll primarily through social media platforms so that it captures younger and more politically engaged voters.',
       'Using random sampling methods to ensure every member of the population has an equal chance of being selected.',
     ],
     correctAnswer: 'D',
@@ -169,9 +169,9 @@ export const govUnit4McqTestQuestions: Question[] = [
     image: null,
     options: [
       'They act as external shocks that can shift the ideological focus of a generation or change the public’s view of government’s proper role.',
-      'They force the government to dissolve all political parties and freeze every generation\'s ideology in place from childhood onward.',
-      'They ensure that all citizens will adopt the exact same ideology.',
-      'They have no impact on political ideology, as socialization ends at age eighteen.',
+      'They tend to freeze each generation’s ideology in place, because views formed in childhood leave citizens largely unaffected by later national crises.',
+      'They tend to produce a lasting consensus in which citizens of every age and party adopt the same ideology and the same policy preferences.',
+      'They have little effect on political ideology, since political socialization is largely complete by the time most citizens reach voting age.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -189,9 +189,9 @@ export const govUnit4McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The methodology, including sampling technique and the framing of the questions.',
-      'The candidate’s own internal polls.',
-      'The popularity of the news network reporting the data.',
-      'Whether the data matches the anecdotal feelings of the voters in the scientist’s own neighborhood.',
+      'The degree to which results match the candidates’ internal polls.',
+      'The popularity and reputation of the news network reporting the data.',
+      'Whether the data matches the views of voters in the scientist’s own neighborhood.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -207,9 +207,9 @@ export const govUnit4McqTestQuestions: Question[] = [
     question: 'Why would a campaign rely on tracking polls throughout an election season?',
     image: null,
     options: [
-      'To provide the final election results before polls close.',
-      'To bypass the need for scientific sampling methods.',
-      'To exclusively identify the political views of voters in a single state.',
+      'To project the final election results for the public before polling places have closed on Election Day.',
+      'To gauge voter opinion quickly without having to rely on expensive scientific sampling methods.',
+      'To identify the political views of voters in one state at a single moment before the primary season.',
       'To monitor how public opinion on a candidate changes over time in response to campaign events.',
     ],
     correctAnswer: 'D',
@@ -230,10 +230,10 @@ export const govUnit4McqTestQuestions: Question[] = [
       alt: 'Line graph showing public trust in the federal government over time since the 1960s',
     },
     options: [
-      'The claim is valid because declining response rates in modern polling make all survey data from after 1980 statistically unreliable, even when multiple independent organizations show the same long-term decline.',
-      'The claim is valid because social desirability bias causes respondents to overreport trust in government, meaning actual trust levels are even lower than the graph shows.',
+      'The claim is valid because declining response rates in modern polling make survey data collected after 1980 statistically unreliable, even when several independent organizations report the same long-term decline in public trust over many decades.',
+      'The claim is valid because social desirability bias leads respondents to overreport their trust in government, which suggests that actual trust has fallen even further than the polling organizations in the graph have shown.',
       'The claim is not well supported because the consistent downward trend across multiple independent polling organizations over decades suggests the data reflects a genuine shift in public attitudes rather than a methodological problem.',
-      'The claim cannot be evaluated because public trust is a qualitative concept that cannot be accurately captured through survey research.',
+      'The claim cannot be evaluated because public trust is a qualitative concept, and survey questions asked across several decades are unable to capture how citizens actually feel about their government.',
     ],
     correctAnswer: 'C',
     explanation:
@@ -253,10 +253,10 @@ export const govUnit4McqTestQuestions: Question[] = [
       alt: 'Line graph showing public trust in the federal government over time since the 1960s',
     },
     options: [
-      'The long-term erosion of public confidence in federal institutions is likely to reduce citizens\' sense that their political participation can produce meaningful change.',
-      'Declining trust in the federal government reflects growing public support for libertarian ideology and minimal government intervention.',
-      'Political socialization through family and schools has become more effective at transmitting pro-government values to younger generations since the 1960s.',
-      'The trend is best explained as a methodological artifact, since long-term polling comparisons are inherently unreliable due to changes in survey methodology over time.',
+      "The long-term erosion of public confidence in federal institutions is likely to reduce citizens' sense that their political participation can produce meaningful change.",
+      'Declining trust in the federal government is likely to reflect growing public support for libertarian ideology and for sharply reduced government intervention in the economy.',
+      'Political socialization through family and schools has become more effective at transmitting pro-government values to younger generations of American citizens since the 1960s.',
+      'The trend is best explained as a methodological artifact, since changes in survey methods over time tend to make long-term polling comparisons across decades unreliable.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -272,7 +272,7 @@ export const govUnit4McqTestQuestions: Question[] = [
     question:
       'Which agent of political socialization is generally considered the most influential in the early development of a child’s political values?',
     image: null,
-    options: ['The Federal Reserve.', 'Political interest groups.', 'The family.', 'Campaign commercials.'],
+    options: ['The workplace.', 'Interest groups.', 'The family.', 'Political ads.'],
     correctAnswer: 'C',
     explanation:
       'The family is historically the first and most powerful influence on a person’s developing political values, providing a primary foundation for later views.',
@@ -289,9 +289,9 @@ export const govUnit4McqTestQuestions: Question[] = [
     image: null,
     options: [
       'Allowing citizens to own weapons while also passing laws that restrict types of weapons in certain areas.',
-      'The total abolition of all police forces to maximize individual freedom.',
-      'The government mandating that all citizens agree on a single political ideology.',
-      'The government banning all forms of speech that are critical of the ruling party.',
+      'Reducing police forces substantially so that citizens can exercise greater personal freedom in public spaces.',
+      'Requiring public schools to teach a single official political ideology in order to promote national unity.',
+      'Prohibiting speech that is critical of the ruling party in order to preserve stability during elections.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -309,7 +309,7 @@ export const govUnit4McqTestQuestions: Question[] = [
     image: null,
     options: [
       'Equality of result, because the permit requirement treats all citizens the same.',
-      'Popular sovereignty, because only elected officials should be allowed to demonstrate.',
+      'Popular sovereignty, because elected officials should decide who is allowed to demonstrate.',
       'Laissez-faire capitalism, because demonstrations are a form of economic activity.',
       'Limited government, because the law expands state power over individual expression.',
     ],
@@ -328,10 +328,10 @@ export const govUnit4McqTestQuestions: Question[] = [
       'A teenager who primarily consumes political content through social media algorithms begins to hold increasingly extreme views compared to their parents. Which of the following best explains this divergence through the lens of political socialization?',
     image: null,
     options: [
-      'The life cycle effect, because teenagers naturally adopt more extreme views as they age and because social media cannot act as a new agent of political socialization.',
+      'The life cycle effect, because teenagers tend to adopt more extreme political views as they move through adolescence and begin to separate from their parents.',
       'The influence of a new socialization agent — social media — exposing the teenager to a narrower, more polarized information environment than traditional media.',
-      'A generational effect, because all teenagers in this era will permanently hold more extreme views.',
-      'Peer pressure from classmates overriding the family as the primary socialization agent.',
+      "A generational effect, because shared historical events during this era have pushed most members of the teenager's age group toward the same extreme views.",
+      'Peer pressure from classmates, because school friendships tend to replace the family as the primary agent of political socialization during the teenage years.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -349,9 +349,9 @@ export const govUnit4McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The senator raises a valid methodological concern, because sampling bias toward urban residents could systematically overstate support for environmental regulation.',
-      'The senator\'s critique is irrelevant because a margin of error of ±3% guarantees the sample is representative even if urban residents were systematically oversampled.',
-      'The senator\'s critique is invalid because polls with large sample sizes are always accurate.',
-      'The senator is correct that all polls overstate support for environmental regulation due to social desirability bias.',
+      "The senator's critique is misplaced because a margin of error of ±3% shows that the sample is representative even if urban residents were oversampled.",
+      "The senator's critique is invalid because a poll with a sufficiently large sample tends to cancel out any imbalance in where its respondents happen to live.",
+      'The senator is correct because polls on environmental regulation tend to overstate support through social desirability bias, regardless of who is sampled.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -368,10 +368,10 @@ export const govUnit4McqTestQuestions: Question[] = [
       'A campaign releases an internal poll two weeks before an election showing their candidate leading by 12 points. A week later, a neutral university releases a poll showing the same candidate leading by only 3 points. Which of the following best explains how a political scientist should interpret these results?',
     image: null,
     options: [
-      'The campaign\'s internal poll is more accurate because it had access to more voter data and because internal polls are designed to be independent of the campaign\'s strategic incentives.',
-      'Both polls are equally valid because they were conducted in the same election cycle.',
+      "The campaign's internal poll should be weighted more heavily because campaigns have access to more detailed voter data and tend to invest heavily in reaching likely supporters.",
+      'Both polls should be treated as equally valid because they measured the same race during the same election cycle, so the best estimate is simply their average.',
       'The university poll should be weighted more heavily because it comes from an independent source with transparent methodology, while internal campaign polls may reflect motivated reasoning.',
-      'Neither poll is reliable because they were conducted before Election Day.',
+      'Neither poll should be given much weight because opinion can shift before Election Day, and only the final vote count can show which candidate truly leads.',
     ],
     correctAnswer: 'C',
     explanation:
@@ -415,10 +415,10 @@ export const govUnit4McqTestQuestions: Question[] = [
       ],
     },
     options: [
-      'Political ideology has no measurable effect on policy preferences.',
+      'Self-identified ideology appears to have little measurable effect on the policy preferences of the Americans surveyed.',
       'Self-identified ideological groups show distinct and predictable policy preferences consistent with their broader ideological frameworks.',
-      'A majority of all Americans support both defense spending and Medicaid expansion simultaneously.',
-      'Conservatives and liberals agree on most major policy issues despite their ideological differences.',
+      'A majority of Americans across ideological groups support increased defense spending and Medicaid expansion at the same time.',
+      'Conservatives and liberals tend to agree on most major policy issues, despite the differences in how they describe their ideologies.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -435,10 +435,10 @@ export const govUnit4McqTestQuestions: Question[] = [
       'Research consistently shows that younger voters are more likely to support expansive government social programs than older voters. Which of the following best explains this pattern using concepts from political socialization?',
     image: null,
     options: [
-      'Older voters have lower levels of education and are therefore less informed about social programs, which fully explains why younger voters prefer a larger government role in the economy.',
+      'Older voters tend to have lower levels of formal education and are therefore less informed about social programs, which is the main reason younger voters are more likely to favor a larger government role in the economy.',
       'A combination of life cycle effects — where younger people have less accumulated wealth and property to protect — and generational effects from coming of age in a period of rising economic inequality.',
-      'Younger voters are more influenced by peer groups, which always favor liberal policies.',
-      'Older voters consistently vote at lower rates, reducing the influence of their preferences on policy.',
+      'Younger voters are more heavily influenced by peer groups, which tend to favor liberal policies and outweigh the values that families and schools pass on during childhood.',
+      'Older voters tend to turn out at lower rates than younger voters, which reduces the influence of their preferences and leaves social programs with broader electoral support.',
     ],
     correctAnswer: 'B',
     explanation:

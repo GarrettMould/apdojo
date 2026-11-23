@@ -48,7 +48,7 @@ const WHO_FOR = [
 ];
 
 const SESSION_STEPS = [
-  'Book a time and tell me what you\'re stuck on.',
+  'Book a time and tell me what you\'re stuck on. You\'ll get your Google Meet link by email.',
   'Meet on Google Meet. We work through real AP questions together.',
   'Leave with a short plan for what to practice next on AP Dojo.',
 ];
@@ -213,7 +213,7 @@ export default function TutoringPage() {
               with your Google Meet link.
             </p>
           </div>
-          <div className="min-w-0 lg:pt-[44px]">
+          <div id="calendar" className="min-w-0 scroll-mt-24 lg:pt-[44px]">
             <TutoringBookingEmbed sessions={TUTORING_SESSION_TYPES} />
             <noscript>
               <a

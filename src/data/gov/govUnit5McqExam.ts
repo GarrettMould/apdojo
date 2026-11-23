@@ -40,9 +40,9 @@ export const govUnit5McqTestQuestions: Question[] = [
     image: null,
     options: [
       'The creation of party platforms that aggregate diverse interests into a cohesive policy agenda.',
-      'The appointment of non-partisan bureaucratic officials to federal agencies.',
-      'The use of judicial review to strike down legislation.',
-      'The enforcement of state voter identification laws.',
+      'The appointment of non-partisan officials to lead major agencies throughout the federal bureaucracy.',
+      'The use of judicial review to strike down legislation that conflicts with the preferences of voters.',
+      'The enforcement of state voter identification laws at polling places during primary and general elections.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -60,9 +60,9 @@ export const govUnit5McqTestQuestions: Question[] = [
     image: null,
     options: [
       'To provide the Court with additional information or arguments to influence the legal outcome.',
-      'To directly lobby the president for a executive order.',
-      'To initiate a grassroots protest at the steps of the courthouse.',
-      'To contribute directly to the justices’ personal campaign funds.',
+      'To persuade the president to issue an executive order on vehicle emission standards.',
+      'To organize a grassroots protest on the courthouse steps while the justices hear the case.',
+      'To fund the campaigns of justices who are expected to rule in favor of the industry.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -79,10 +79,10 @@ export const govUnit5McqTestQuestions: Question[] = [
       'In *Citizens United v. FEC* (2010), the Supreme Court ruled that political spending by corporations and labor unions is a form of protected speech. Which of the following is a direct consequence of this decision?',
     image: null,
     options: [
-      'A decrease in the amount of money spent on federal elections, because independent groups can no longer raise unlimited sums once they remain separate from a candidate.',
+      'A decrease in federal election spending, because independent groups became subject to new limits on what they may raise.',
       'The creation of Super PACs that can raise and spend unlimited sums of money independently of candidates.',
-      'A ban on all corporate contributions to political candidates.',
-      'The total elimination of the Bipartisan Campaign Reform Act.',
+      'A new ban on corporate and union spending on political advertising near federal elections.',
+      'The elimination of federal limits on how much individuals and corporations may give directly to candidates.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -96,13 +96,13 @@ export const govUnit5McqTestQuestions: Question[] = [
     unitName: 'Political Participation',
     questionGroup: 'u5-stim-federalist-10',
     question:
-      'Questions 5-6 refer to the following excerpt.\n\n"The influence of factious leaders may kindle a flame within their particular States, but will be unable to spread a general conflagration through the other States... A rage for paper money, for an abolition of debts, for an equal division of property, or for any other improper or wicked project, will be less apt to pervade the whole body of the Union than a particular member of it."\n—Publius (Alexander Hamilton), Federalist No. 10, 1787\n\nHow does Madison’s argument in this excerpt address the modern role of interest groups?',
+      'Questions 5-6 refer to the following excerpt.\n\n"The influence of factious leaders may kindle a flame within their particular States, but will be unable to spread a general conflagration through the other States... A rage for paper money, for an abolition of debts, for an equal division of property, or for any other improper or wicked project, will be less apt to pervade the whole body of the Union than a particular member of it."\n—Publius (James Madison), Federalist No. 10, 1787\n\nHow does Madison’s argument in this excerpt address the modern role of interest groups?',
     image: null,
     options: [
-      'He argues that interest groups should be banned from political participation, because a large republic cannot control factions and must instead remove the liberty to form them.',
+      'He argues that interest groups should be restricted, because a republic can control factions by limiting the liberty to form them.',
       'He suggests that a large republic dilutes the power of harmful "factions" by preventing them from dominating the entire nation.',
-      'He advocates for a small, localized democracy to ensure all interests are represented.',
-      'He claims that the wealthy are the only group capable of participating in a republic.',
+      'He advocates for a small, localized democracy, where citizens can be confident that their many interests are fairly represented.',
+      'He suggests that the wealthy are best suited to participate in a republic, because their property protects them against factions.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -119,10 +119,10 @@ export const govUnit5McqTestQuestions: Question[] = [
       'Which of the following modern political phenomena best aligns with Madison’s concern about the "mischiefs of faction" in Federalist No. 10?',
     image: null,
     options: [
-      'The emergence of "Super PACs" that allow interest groups to spend unlimited, undisclosed sums to influence legislative agendas.',
-      'The expansion of the federal bureaucracy to handle increasingly technical regulatory issues.',
-      'The decline in the number of third-party candidates appearing on general election ballots.',
-      'The increase in bipartisan cooperation on foreign policy initiatives in the Senate.',
+      'The emergence of "Super PACs" that allow interest groups to spend unlimited sums to influence elections and legislative agendas.',
+      'The expansion of the federal bureaucracy to manage increasingly technical regulatory issues across a growing number of policy areas.',
+      'The decline in the number of third-party candidates appearing on general election ballots in competitive states across the country.',
+      'The increase in bipartisan cooperation on foreign policy initiatives among senators from both of the major political parties in Congress.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -142,9 +142,9 @@ export const govUnit5McqTestQuestions: Question[] = [
       alt: 'Bar chart showing third party presidential candidate vote shares over time',
     },
     options: [
-      'The Constitution prohibits third party candidates from receiving electoral votes in presidential elections.',
-      'The Federal Election Commission systematically excludes third party candidates from official vote counts.',
-      'Third party candidates are prohibited by federal law from appearing on the ballot in more than half of the states, and the Constitution independently bars them from receiving electoral votes even when they win a state plurality, which is why scattered national support cannot become electors.',
+      'The Constitution prevents electors from casting votes for third party candidates unless those candidates first win the endorsement of a major party, which keeps candidates with broad national followings from turning popular support into electoral votes.',
+      'The Federal Election Commission excludes third party candidates from official vote counts in most states, so the popular votes they receive nationwide are not reported to the electors who formally choose the president of the United States.',
+      'Federal law prevents third party candidates from appearing on the ballot in more than half of the states, which means that even candidates with strong national support cannot compete for those electoral votes and so finish with none in the final count.',
       'The winner-take-all structure of the Electoral College means that a candidate must win a plurality in a state to receive any of its electoral votes, making it nearly impossible for third party candidates with diffuse national support to translate popular votes into electoral votes.',
     ],
     correctAnswer: 'D',
@@ -166,9 +166,9 @@ export const govUnit5McqTestQuestions: Question[] = [
     },
     options: [
       'Structural barriers, including ballot access laws and winner-take-all rules, make it extremely difficult for third parties to sustain long-term electoral success despite occasional spikes in popularity.',
-      'Voter dissatisfaction with the two major parties has steadily decreased since 1992, leading to the decline of third-party efforts.',
-      'The Federal Election Commission\'s public financing rules have created a financial advantage that allows third parties to consistently outperform major party candidates.',
-      'Third-party candidates have voluntarily stopped running in presidential elections after 1996 to avoid interfering with major party platforms.',
+      'Voter dissatisfaction with the two major parties has steadily decreased since 1992, which has reduced demand for alternatives and led to a gradual decline in third-party efforts nationwide.',
+      "The Federal Election Commission's public financing rules have created a financial advantage that allows third parties to consistently outperform major party candidates in most presidential elections since 1992.",
+      'Third-party candidates have largely chosen to stop running in presidential elections since 1996, in order to avoid splitting the vote and interfering with the platforms of the major parties.',
     ],
     correctAnswer: 'A',
     explanation:
@@ -184,9 +184,9 @@ export const govUnit5McqTestQuestions: Question[] = [
     question: 'How has the rise of "candidate-centered" campaigns affected the traditional role of political parties?',
     image: null,
     options: [
-      'It has made the party structure the central focus of all political messaging.',
-      'It has effectively eliminated the need for candidates to raise money.',
-      'It has resulted in stricter party discipline and forced all candidates to adopt identical platforms.',
+      'It has made the national party organization the central focus of most political messaging in campaigns.',
+      'It has reduced the need for candidates to raise money, since party committees now fund most of their campaigns.',
+      'It has resulted in stricter party discipline, with candidates increasingly required to adopt national platforms.',
       'It has shifted power away from party leadership and toward individual candidates and their personal fundraising networks.',
     ],
     correctAnswer: 'D',
@@ -203,9 +203,9 @@ export const govUnit5McqTestQuestions: Question[] = [
     question: 'Which of the following structural factors is most likely to result in lower voter turnout in a state election?',
     image: null,
     options: [
-      'Automatic, same-day voter registration laws.',
-      'Holding elections on weekends.',
-      'Universal mail-in balloting for all eligible voters.',
+      'Automatic voter registration combined with same-day registration at polling places.',
+      'Holding elections on weekends combined with extended early voting hours.',
+      'Universal mail-in balloting combined with prepaid return postage for all eligible voters.',
       'Strict photo identification requirements combined with limited polling station hours.',
     ],
     correctAnswer: 'D',
@@ -226,10 +226,10 @@ export const govUnit5McqTestQuestions: Question[] = [
       alt: 'Map showing which U.S. states have adopted automatic voter registration',
     },
     options: [
-      'States that have not adopted automatic voter registration have done so because their electorates have consistently voted against registration reform in statewide referenda.',
-      'The Constitution prohibits Congress from passing federal voter registration laws because elections are exclusively reserved to the states under the Electoral College system.',
+      'States that have not adopted automatic voter registration have generally done so because their electorates rejected registration reform in statewide referenda, which discourages Congress from acting.',
+      'The Constitution bars Congress from passing voter registration laws because the administration of elections is reserved to the states under the Electoral College system, leaving no federal role.',
       'The decentralized structure of American federalism allows states to determine their own voter registration procedures, creating variation in structural barriers to participation across the country.',
-      'Federal campaign finance laws prevent Congress from allocating funds necessary to implement a national automatic voter registration system.',
+      'Federal campaign finance laws prevent Congress from allocating the funds needed to implement a national automatic voter registration system, which leaves the cost of reform to individual states across the country.',
     ],
     correctAnswer: 'C',
     explanation:
@@ -249,9 +249,9 @@ export const govUnit5McqTestQuestions: Question[] = [
       alt: 'Map showing which U.S. states have adopted automatic voter registration',
     },
     options: [
-      'States with automatic voter registration report higher levels of candidate spending per voter than states without it.',
-      'Research shows that the primary reason citizens do not vote is dissatisfaction with the available candidates rather than administrative barriers to registration, so automatic voter registration cannot raise turnout among low-income or young eligible citizens.',
-      'States without automatic voter registration consistently hold their elections on weekdays, which reduces turnout independent of registration requirements.',
+      'States with automatic voter registration report higher levels of candidate spending per voter than states without it, and those campaigns also tend to air more television advertising during the final weeks of an election.',
+      'Research shows that most citizens who do not vote cite dissatisfaction with the available candidates rather than administrative barriers, which suggests that automatic registration would do little to raise turnout among eligible citizens.',
+      'States without automatic voter registration tend to hold their elections on weekdays, which reduces turnout among working citizens through a scheduling barrier that operates independently of any registration requirement.',
       'Data shows that a significant percentage of eligible citizens who do not vote cite not being registered as their reason for not participating, and AVR states show measurably higher registration rates among low-income and young voters.',
     ],
     correctAnswer: 'D',
@@ -288,10 +288,10 @@ export const govUnit5McqTestQuestions: Question[] = [
     question: 'What is a likely consequence of "ideologically oriented programming" (partisan news sources) for American democracy?',
     image: null,
     options: [
-      'An increase in the number of citizens who consume centrist, neutral news.',
-      'A decrease in political knowledge among the electorate.',
+      'Citizens may increasingly turn to centrist, neutral news as partisan outlets compete for their attention.',
+      'Citizens may grow more trusting of government institutions as partisan outlets explain official decisions.',
       'Citizens may become more polarized as they consume content that reinforces their pre-existing beliefs.',
-      'Parties will become less relevant to the average voter.',
+      'Partisan divisions may fade as audiences encounter a wider range of viewpoints across competing news outlets.',
     ],
     correctAnswer: 'C',
     explanation:
@@ -305,13 +305,13 @@ export const govUnit5McqTestQuestions: Question[] = [
     unitName: 'Political Participation',
     questionGroup: 'u5-stim-baker-carr',
     question:
-      'Questions 12-13 refer to the following summary.\n\n*Baker v. Carr* (1961) was a landmark case in which the Supreme Court ruled that federal courts have the authority to intervene in cases of state legislative apportionment. The Court held that redistricting is not merely a "political question" and that malapportioned districts violate the Fourteenth Amendment’s Equal Protection Clause.\n\nThe decision in *Baker v. Carr* directly impacted which of the following political processes?',
+      'Questions 12-13 refer to the following summary.\n\n*Baker v. Carr* (1962) was a landmark case in which the Supreme Court ruled that federal courts have the authority to intervene in cases of state legislative apportionment. The Court held that redistricting is not merely a "political question" and that malapportioned districts violate the Fourteenth Amendment’s Equal Protection Clause.\n\nThe decision in *Baker v. Carr* directly impacted which of the following political processes?',
     image: null,
     options: [
-      'The criteria for federal judicial appointments.',
+      'The criteria used to select federal judges and Supreme Court justices.',
       'The drawing of congressional and state legislative district boundaries.',
-      'The length of time a senator can serve.',
-      'The number of members in the House of Representatives.',
+      'The length of time that members of the Senate are allowed to serve.',
+      'The total number of members who serve in the House of Representatives.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -324,13 +324,13 @@ export const govUnit5McqTestQuestions: Question[] = [
     lessonIDS: ['5.1'],
     unitName: 'Political Participation',
     questionGroup: 'u5-concept-shaw-reno',
-    question: 'How does the holding in *Shaw v. Reno* (1993) differ from the decision in *Baker v. Carr* (1961)?',
+    question: 'How does the holding in *Shaw v. Reno* (1993) differ from the decision in *Baker v. Carr* (1962)?',
     image: null,
     options: [
-      'It grants state legislatures total freedom to draw districts as they see fit.',
+      'It gives state legislatures broad freedom to draw districts without any review by the federal courts.',
       'It places limitations on the use of race as the predominant factor in drawing district boundaries.',
-      'It requires that all districts be perfectly square in shape.',
-      'It prohibits the use of population as a factor in redistricting.',
+      'It requires that districts be drawn in compact, regular shapes that follow existing county boundaries.',
+      'It prohibits states from using population counts as the primary factor when they redraw district boundaries.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -347,10 +347,10 @@ export const govUnit5McqTestQuestions: Question[] = [
       'Which of the following best explains the trend of significantly higher voter turnout in presidential election years compared to midterm election years?',
     image: null,
     options: [
-      'Federal law mandates that midterm elections be held in alternate months, creating confusion for the electorate.',
-      'Presidential elections feature higher national media visibility and a wider perception that the presidency has a greater impact on the average citizen\'s life.',
-      'States are constitutionally prohibited from opening polling stations for midterm elections.',
-      'Voter registration is automatically cancelled by the federal government at the end of a presidential term, requiring all voters to re-register.',
+      'Federal law schedules midterm elections in alternating months from state contests, which tends to create confusion about when and where eligible citizens should vote.',
+      "Presidential elections feature higher national media visibility and a wider perception that the presidency has a greater impact on the average citizen's life.",
+      'States are constitutionally restricted in how many polling stations they may open for midterm elections, which makes voting less convenient for many citizens.',
+      'Voter registration is automatically cancelled by the federal government after each presidential election, which requires many voters to re-register before the next midterm.',
     ],
     correctAnswer: 'B',
     explanation:
@@ -366,10 +366,10 @@ export const govUnit5McqTestQuestions: Question[] = [
     question: 'Which of the following is an effective, modern technique political parties use to mobilize their base?',
     image: null,
     options: [
-      'Formally nominating candidates during private, invitation-only conventions that exclude the general public.',
-      'Directly appointing legislative committee chairs to bypass the primary election process.',
+      'Formally nominating candidates at private, invitation-only conventions that keep the public out of the selection process.',
+      'Directly appointing candidates to legislative committee chairs in order to bypass the primary election process.',
       'Utilizing sophisticated voter databases to micro-target messages and send personalized digital outreach to low-propensity voters.',
-      'Passing state laws that make it illegal for voters to register for more than one party.',
+      'Passing state laws that restrict voters from registering with more than one party in order to lock in their long-term loyalty.',
     ],
     correctAnswer: 'C',
     explanation:
