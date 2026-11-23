@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import { ArrowRight, Check, ChevronDown, Quote, Star } from 'lucide-react';
+import { ArrowRight, Check, ChevronDown, Star } from 'lucide-react';
 import {
   FREE_SEASON_PASS_LINE,
   TUTOR,
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 const card = 'rounded-[20px] border border-slate-200 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)]';
 /** Zooms the full-length headshot in on head and shoulders for the circular crops. */
 const headshotCrop = 'object-cover object-[50%_0%] scale-[1.35] origin-[50%_12%]';
-const sectionHeading = 'text-2xl font-extrabold tracking-tight text-slate-900 sm:text-[28px]';
+const sectionHeading = 'text-2xl font-bold tracking-tight text-slate-900 sm:text-[28px]';
 
 const STATS = [
   { value: `${TUTOR.yearsTeaching} years`, label: 'teaching AP Economics' },
@@ -69,10 +69,7 @@ function Stars({ className = 'h-4 w-4' }: { className?: string }) {
 function ReviewCard({ review }: { review: (typeof tutoringReviews)[number] }) {
   return (
     <figure className={`${card} mb-4 flex break-inside-avoid flex-col gap-3 p-5`}>
-      <div className="flex items-center justify-between gap-3">
-        <Stars />
-        <Quote className="h-5 w-5 text-slate-200" aria-hidden />
-      </div>
+      <Stars />
       {review.title ? <p className="text-[15px] font-bold leading-snug text-slate-900">{review.title}</p> : null}
       <blockquote className="text-[15px] leading-relaxed text-slate-600">{review.text}</blockquote>
       <figcaption className="text-sm text-slate-500">
@@ -93,91 +90,86 @@ export default function TutoringPage() {
     <div className="min-h-screen bg-slate-50 pb-24 text-slate-900">
       <TutoringPageView />
 
-      {/* 1. Hero band: AP Dojo blue, full width, with the stats along the bottom */}
-      <section className="relative overflow-hidden bg-blue-600 text-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.14)_1px,transparent_1px)] [background-size:22px_22px]"
-        />
-        <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 px-4 pb-14 pt-12 sm:px-6 sm:pt-16 lg:grid-cols-[1.35fr_1fr] lg:gap-10 lg:pb-16">
-          <div className="flex flex-col items-start gap-6">
-            <p className="rounded-xl border-2 border-white px-3.5 py-1.5 text-base font-extrabold tracking-tight sm:text-lg">
+      {/* 1. Hero: plain AP Dojo blue, headline and booking on the left, tutor on the right */}
+      <section className="bg-blue-600 text-white">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 items-center gap-10 px-4 py-14 sm:py-20 lg:grid-cols-[1.3fr_1fr] lg:gap-10 lg:px-0">
+          <div className="flex max-w-2xl flex-col items-start gap-5">
+            <p className="text-sm font-semibold uppercase tracking-wider text-blue-100">
               1-on-1 AP Macro &amp; Micro tutoring
             </p>
-            <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-[52px]">
+            <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
               Learn AP Economics from a teacher who knows the exam.
             </h1>
-            <p className="max-w-xl text-base leading-relaxed text-blue-50 sm:text-lg">
-              Stuck on graphs, FRQs or a whole unit? Book a live session over Google Meet and work through it together.
+            <p className="text-lg leading-relaxed text-blue-100">
+              Live sessions over Google Meet for graphs, FRQs or a whole unit.
             </p>
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
+            <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-3">
               <TutoringBookLink
                 source="hero"
-                className="inline-flex min-h-[52px] items-center gap-2 rounded-xl bg-slate-950 px-6 py-3 text-base font-semibold text-white shadow-[0_8px_20px_rgba(15,23,42,0.25)] transition hover:-translate-y-px hover:bg-slate-800"
+                className="inline-flex min-h-12 items-center gap-2 rounded-lg bg-white px-6 py-3 text-base font-semibold text-blue-700 transition hover:bg-blue-50"
               >
                 Book a session <ArrowRight className="h-4 w-4" aria-hidden />
               </TutoringBookLink>
               <p className="text-base text-blue-100">
-                <span className="text-2xl font-extrabold text-white">{TUTOR.hourlyRate}</span> per hour
+                <span className="font-semibold text-white">{TUTOR.hourlyRate}</span> per hour
               </p>
             </div>
           </div>
 
-          {/* Profile collage */}
-          <div className="relative mx-auto w-full max-w-[400px] px-2 py-10 sm:px-8">
-            <div className="mx-auto flex w-full max-w-[290px] flex-col items-center rounded-3xl bg-white px-6 pb-[104px] pt-8 text-center text-slate-900 shadow-[0_24px_60px_rgba(15,23,42,0.25)]">
-              <div className="relative h-44 w-44 overflow-hidden rounded-full bg-slate-100 ring-4 ring-blue-50">
+          {/* Profile card, with the rating and experience cards overlapping its corners */}
+          <div className="relative mx-auto w-full max-w-[340px] px-2 py-8 sm:px-6">
+            <div className="mx-auto flex w-full max-w-[250px] flex-col items-center rounded-3xl bg-white px-5 pb-[88px] pt-6 text-center text-slate-900 shadow-[0_24px_60px_rgba(15,23,42,0.25)]">
+              <div className="relative h-36 w-36 overflow-hidden rounded-full bg-slate-100 ring-4 ring-blue-50">
                 <Image
                   src={headshot}
                   alt={`${TUTOR.name}, AP Economics tutor`}
                   fill
                   priority
-                  sizes="176px"
+                  sizes="144px"
                   className={headshotCrop}
                 />
               </div>
-              <p className="mt-4 text-xl font-extrabold tracking-tight">{TUTOR.name}</p>
-              <p className="mt-0.5 text-sm text-slate-600">AP Macro &amp; AP Micro teacher · creator of AP Dojo</p>
+              <p className="mt-3 text-lg font-bold tracking-tight">{TUTOR.name}</p>
+              <p className="mt-0.5 text-[13px] leading-snug text-slate-600">AP Macro &amp; AP Micro teacher · creator of AP Dojo</p>
             </div>
 
             <a
               href="#reviews"
-              className="absolute right-0 top-0 flex flex-col gap-1 rounded-2xl bg-white px-4 py-3 text-slate-900 shadow-[0_12px_32px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5"
+              className="absolute right-0 top-0 flex flex-col gap-0.5 rounded-xl bg-white px-3.5 py-2.5 text-slate-900 shadow-[0_12px_32px_rgba(15,23,42,0.22)] transition hover:-translate-y-0.5"
             >
               <Stars className="h-3.5 w-3.5" />
               <span className="text-sm">
-                <span className="text-lg font-extrabold">{TUTOR.averageRating}</span>
+                <span className="text-base font-bold">{TUTOR.averageRating}</span>
                 <span className="text-slate-500"> · {TUTOR.fiveStarReviews} reviews</span>
               </span>
             </a>
 
-            <dl className="absolute bottom-0 left-0 flex w-[230px] flex-col gap-2.5 rounded-2xl bg-white px-4 py-3.5 text-slate-900 shadow-[0_12px_32px_rgba(15,23,42,0.22)]">
+            <dl className="absolute -bottom-2 left-0 flex w-[200px] flex-col gap-2 rounded-xl bg-white px-3.5 py-3 text-slate-900 shadow-[0_12px_32px_rgba(15,23,42,0.22)]">
               <div>
                 <dt className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Years teaching AP</dt>
-                <dd className="text-base font-extrabold">{TUTOR.yearsTeaching}</dd>
+                <dd className="text-base font-bold">{TUTOR.yearsTeaching}</dd>
               </div>
               <div>
                 <dt className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Courses</dt>
-                <dd className="text-sm font-semibold leading-snug">{TUTOR.courses}</dd>
+                <dd className="text-[13px] font-semibold leading-snug">{TUTOR.courses}</dd>
               </div>
             </dl>
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="relative mx-auto max-w-6xl px-4 pb-12 sm:px-6">
-          <dl className="grid grid-cols-2 gap-y-8 border-t border-white/25 pt-10 sm:grid-cols-4">
+        <div className="border-t border-white/15">
+          <dl className="mx-auto grid max-w-5xl grid-cols-2 gap-y-6 px-4 py-8 sm:grid-cols-4 lg:px-0">
             {STATS.map((stat) => (
-              <div key={stat.label} className="flex flex-col items-center gap-1 text-center">
-                <dt className="order-2 text-sm text-blue-100 sm:text-base">{stat.label}</dt>
-                <dd className="order-1 text-3xl font-extrabold tracking-tight sm:text-4xl">{stat.value}</dd>
+              <div key={stat.label} className="flex flex-col gap-0.5">
+                <dt className="order-2 text-sm text-blue-100">{stat.label}</dt>
+                <dd className="order-1 text-2xl font-bold tracking-tight">{stat.value}</dd>
               </div>
             ))}
           </dl>
         </div>
       </section>
 
-      <div className="bg-[radial-gradient(#dbe3ee_1px,transparent_1px)] px-4 pt-14 [background-size:22px_22px] sm:pt-16">
+      <div className="px-4 pt-14 sm:pt-16">
       <div className="mx-auto flex max-w-5xl flex-col gap-14 sm:gap-16">
         {/* 2. Price and booking, side by side */}
         <section
@@ -194,7 +186,7 @@ export default function TutoringPage() {
                 <div>
                   <h3 className="text-lg font-bold tracking-tight">{session.name}</h3>
                   <p className="mt-1 flex items-baseline gap-1.5">
-                    <span className="text-4xl font-extrabold tracking-tight text-slate-900">{session.price}</span>
+                    <span className="text-4xl font-bold tracking-tight text-slate-900">{session.price}</span>
                     {session.priceUnit ? <span className="text-base text-slate-500">{session.priceUnit}</span> : null}
                   </p>
                 </div>
