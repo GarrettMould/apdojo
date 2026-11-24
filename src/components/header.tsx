@@ -446,6 +446,26 @@ export function Header() {
                               </div>
 
 
+                              {user && FEATURES.tutoring && (
+                                <div className="border-t border-gray-200 pt-3 mt-3 flex flex-col">
+                                  <Link
+                                    href="/my-bookings"
+                                    onClick={() => setIsBeltDropdownOpen(false)}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 transition-colors rounded-md font-medium"
+                                  >
+                                    My bookings
+                                  </Link>
+                                  {/* Placeholder until progress reports exist */}
+                                  <a
+                                    href="#"
+                                    onClick={(e) => e.preventDefault()}
+                                    className="w-full text-left px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 transition-colors rounded-md font-medium"
+                                  >
+                                    Progress reports
+                                  </a>
+                                </div>
+                              )}
+
                               {user && (
                                 <div className="border-t border-gray-200 pt-3 mt-3">
                                   {(user.email ?? userData?.email) && (
@@ -647,6 +667,26 @@ export function Header() {
                   className="w-full min-w-0"
                   userData={userData}
                 />
+
+                {user && FEATURES.tutoring && (
+                  <div className="flex flex-col">
+                    <Link
+                      href="/my-bookings"
+                      onClick={closeMobileMenu}
+                      className="px-4 py-3 text-lg font-bold text-gray-800 hover:bg-gray-100 rounded-xl transition-colors"
+                    >
+                      My bookings
+                    </Link>
+                    {/* Placeholder until progress reports exist */}
+                    <a
+                      href="#"
+                      onClick={(e) => e.preventDefault()}
+                      className="px-4 py-3 text-lg font-bold text-gray-800 hover:bg-gray-100 rounded-xl transition-colors"
+                    >
+                      Progress reports
+                    </a>
+                  </div>
+                )}
 
                 {user && (
                   <div className="space-y-1">

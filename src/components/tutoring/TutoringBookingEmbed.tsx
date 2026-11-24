@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { calBookingUrl, type TutoringSessionType } from '@/data/tutoring';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { CAL_METADATA_UID_KEY } from '@/lib/tutoringBookings';
 import { trackEvent } from '@/lib/analytics';
 import { secondaryButton } from '@/components/guidedLesson/styles';
 
@@ -23,6 +25,14 @@ export function TutoringBookingEmbed({ sessions }: { sessions: TutoringSessionTy
   const [inView, setInView] = useState(false);
   const [status, setStatus] = useState<EmbedStatus>(active?.calLink ? 'waiting' : 'failed');
   const namespace = `tutoring-${active?.id ?? 'session'}`;
+  const { user } = useAuthContext();
+  // Signed-in bookers: tie the booking to their account (for My Bookings) and prefill their email.
+  const calConfig: Record<string, string> = { layout: 'month_view', theme: 'light' };
+  if (user) {
+    calConfig[`metadata[${CAL_METADATA_UID_KEY}]`] = user.uid;
+    if (user.email) calConfig.email = user.email;
+    if (user.displayName) calConfig.name = user.displayName;
+  }
 
   // Load the embed only when the booking section is near the viewport.
   useEffect(() => {
@@ -132,7 +142,7 @@ export function TutoringBookingEmbed({ sessions }: { sessions: TutoringSessionTy
                 namespace={namespace}
                 calLink={active.calLink}
                 style={{ width: '100%', height: '100%', minHeight: 680, overflow: 'auto' }}
-                config={{ layout: 'month_view', theme: 'light' }}
+                config={calConfig}
               />
             ) : null}
           </>
