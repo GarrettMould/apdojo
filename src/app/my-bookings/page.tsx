@@ -187,32 +187,34 @@ export default function MyBookingsPage() {
           <h2 id="upcoming-heading" className="text-lg font-bold text-slate-900">
             Upcoming
           </h2>
+          {/* Always first, so booking is in the same place whether or not a lesson is coming up. */}
+          <Link
+            href="/tutoring#book"
+            className={`${card} group flex items-center gap-4 p-5 transition hover:-translate-y-px hover:border-blue-200 hover:shadow-[0_8px_24px_-12px_rgba(37,99,235,0.35)] sm:gap-5 sm:p-6`}
+          >
+            <span className="relative inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+              <CalendarDays className="h-7 w-7" aria-hidden />
+              <span className="absolute -right-1 -top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white ring-4 ring-white">
+                <Plus className="h-3 w-3" strokeWidth={3} aria-hidden />
+              </span>
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-bold text-slate-900">
+                {upcoming.length > 0 ? 'Book another session' : 'Book your next session'}
+              </span>
+              <span className="block text-sm text-slate-500">Pick a time that works. 1-on-1 with Garrett over video.</span>
+            </span>
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white transition group-hover:translate-x-0.5 group-hover:bg-blue-700">
+              <ArrowRight className="h-5 w-5" aria-hidden />
+            </span>
+          </Link>
           {upcoming.length > 0 ? (
             <ul className="flex flex-col gap-3">
               {upcoming.map((booking) => (
                 <BookingCard key={booking.id} booking={booking} upcoming />
               ))}
             </ul>
-          ) : (
-            <Link
-              href="/tutoring#book"
-              className={`${card} group flex items-center gap-4 p-5 transition hover:-translate-y-px hover:border-blue-200 hover:shadow-[0_8px_24px_-12px_rgba(37,99,235,0.35)] sm:gap-5 sm:p-6`}
-            >
-              <span className="relative inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-                <CalendarDays className="h-7 w-7" aria-hidden />
-                <span className="absolute -right-1 -top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white ring-4 ring-white">
-                  <Plus className="h-3 w-3" strokeWidth={3} aria-hidden />
-                </span>
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-bold text-slate-900">Book your next session</span>
-                <span className="block text-sm text-slate-500">Pick a time that works. 1-on-1 with Garrett over video.</span>
-              </span>
-              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white transition group-hover:translate-x-0.5 group-hover:bg-blue-700">
-                <ArrowRight className="h-5 w-5" aria-hidden />
-              </span>
-            </Link>
-          )}
+          ) : null}
         </section>
 
         {past.length > 0 ? (
