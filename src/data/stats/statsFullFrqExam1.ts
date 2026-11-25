@@ -198,47 +198,68 @@ export const statsFullFrqExam1: StatsFullFrqExam = {
         rowHeaders: true,
       },
       directionsAfterTable:
-        'Each difference is the rested score minus the sleep-deprived score. The mean of the 12 differences is 2.42 points and the standard deviation of the differences is 2.61 points. A dotplot of the differences is approximately symmetric with no outliers.',
+        'Each difference is the rested score minus the sleep-deprived score. The mean of the 12 differences is 2.42 points and the standard deviation of the differences is 2.61 points. A dotplot of the differences is approximately symmetric with no outliers.\n\nComplete the appropriate inference procedure to determine whether there is convincing statistical evidence, at the 0.05 significance level, that the mean quiz score for all students at the school is higher after a night of normal sleep than after a night with only 4 hours of sleep.',
       parts: [
         {
           label: 'A',
-          text: 'Is there convincing evidence that, on average, students at this school score higher on the quiz after a full night of sleep than after a night of only 4 hours of sleep? Use a significance level of α = 0.05.',
+          text: 'Identify the appropriate inference procedure.',
           answerType: 'text',
           answer: frqAnswer(
+            'A paired t-test for a population mean difference (a one-sample t-test on the differences, rested minus sleep-deprived).',
             [
-              'Hypotheses: H0: μd = 0 and Ha: μd > 0, where μd is the true mean difference (Rested − Deprived) in vocabulary quiz score for students at this school.',
-              'Procedure and conditions: paired (one-sample) t-test for a mean difference. Random: the 12 students were randomly selected from the school, and the order of the quizzes was randomly assigned by a coin flip; 12 is less than 10% of the students at a large school. Normal: n = 12 < 30, but the dotplot of the differences is approximately symmetric with no outliers.',
-              'Test: t = (2.4167 − 0)/(2.6097/√12) ≈ 3.21, df = 11, p-value ≈ 0.004.',
-              'Conclusion: because 0.004 < 0.05, reject H0. There is convincing evidence that the true mean quiz score is higher after a full night of sleep than after 4 hours of sleep for students at this school.',
-            ].join('\n\n'),
-            [
-              'States H0: μd = 0 and Ha: μd > 0, with μd defined in context as the true mean difference (rested minus deprived) for students at this school. A two-sided Ha or sample statistics do not earn the point.',
-              'Identifies a paired t-test (one-sample t-test on the differences). A two-sample t-test does not earn the point.',
-              'Random condition: the students were randomly selected, or the quiz order was randomly assigned by coin flip.',
-              'Normal condition: with n = 12 < 30, uses the symmetric dotplot of differences with no outliers.',
-              'Test statistic t ≈ 3.21 with df = 11.',
-              'p-value ≈ 0.004 (0.003 to 0.005). A two-sided p-value of 0.008 does not earn the point.',
-              'Compares the p-value to α: 0.004 < 0.05, so reject H0.',
-              'Conclusion in context: convincing evidence that the true mean score is higher after a full night of sleep for students at this school. Generalizing beyond the school is not supported.',
+              'Identifies a paired t-test for a mean difference (or a one-sample t-test on the differences). A two-sample t-test does not earn the point, because each student took both quizzes.',
             ]
           ),
         },
         {
           label: 'B',
-          text: 'Interpret the p-value in the context of this study.',
+          text: 'State the hypotheses, define the parameter, and verify the conditions for the procedure.',
           answerType: 'text',
           answer: frqAnswer(
-            'If the true mean difference were 0, there would be about a 0.4% chance of observing a sample mean difference of 2.42 points or greater.',
-            ['Interprets the p-value assuming H0 is true: about a 0.004 probability of a sample mean difference of 2.42 points or greater. "The probability that H0 is true" does not earn the point.']
+            [
+              'Hypotheses: H0: μd = 0 and Ha: μd > 0, where μd is the population mean difference (rested − sleep-deprived) in vocabulary quiz score for all students at this school.',
+              'Random: the 12 students were randomly selected from the school, and the order of the two quizzes was randomly assigned by a coin flip. 10%: 12 students is less than 10% of all students at a large high school.',
+              'Normal: n = 12 < 30, but the dotplot of the differences is approximately symmetric with no outliers, so a t procedure is reasonable.',
+            ].join('\n\n'),
+            [
+              'States H0: μd = 0 and Ha: μd > 0 and defines μd as the population (true) mean difference in quiz score, rested minus sleep-deprived, for all students at this school. A two-sided alternative, a sample mean, or a parameter with no context does not earn the point.',
+              'Random and 10% conditions: random selection of students (or random order of quizzes by coin flip), and 12 is less than 10% of the students at the school. Both are needed.',
+              'Normal condition: with n = 12 < 30, uses the approximately symmetric dotplot of differences with no outliers. Stating n ≥ 30 or checking each set of scores separately does not earn the point.',
+            ]
           ),
         },
         {
           label: 'C',
-          text: 'Based on your conclusion, describe a Type I error in the context of this study.',
+          text: 'Calculate the test statistic and the p-value.',
           answerType: 'text',
           answer: frqAnswer(
-            'A Type I error would be concluding that students at this school score higher on average after a full night of sleep when in fact the true mean scores are the same.',
-            ['Describes a Type I error in context: concluding mean scores are higher after full sleep when in fact the true mean difference is 0.']
+            't = (2.42 − 0)/(2.61/√12) ≈ 3.21 with df = 11. p-value = P(t ≥ 3.21) ≈ 0.004.',
+            [
+              'Calculates t ≈ 3.21 with df = 11, showing the formula with the correct values. An arithmetic slip can be ignored if correct work is shown.',
+              'Reports a one-sided p-value ≈ 0.004 (0.003 to 0.005). A two-sided p-value of 0.008 does not earn the point.',
+            ]
+          ),
+        },
+        {
+          label: 'D',
+          text: 'Interpret the p-value and justify a conclusion, in context.',
+          answerType: 'text',
+          answer: frqAnswer(
+            'If the true mean difference in quiz score were 0, there would be about a 0.004 probability of getting a sample mean difference of 2.42 points or greater by chance alone. Because the p-value of 0.004 is less than α = 0.05, reject H0. There is convincing statistical evidence that the mean vocabulary quiz score for all students at this school is higher after a night of normal sleep than after a night with only 4 hours of sleep.',
+            [
+              'Interprets the p-value assuming H0 is true: about a 0.004 probability of a sample mean difference of 2.42 points or greater if the true mean difference is 0. "The probability that H0 is true" does not earn the point.',
+              'Compares the p-value with α and makes a formal decision: 0.004 < 0.05, so reject H0. A decision consistent with an incorrect p-value from part C earns the point.',
+              'Concludes in context: convincing evidence that the true mean quiz score is higher after normal sleep for all students at this school. Saying the result was "proven," or generalizing beyond this school, does not earn the point.',
+            ]
+          ),
+        },
+        {
+          label: 'E',
+          text: 'Based on your conclusion in part D, describe a Type I error in the context of this study.',
+          answerType: 'text',
+          answer: frqAnswer(
+            'A Type I error would be concluding that students at this school score higher on average after a night of normal sleep when in fact the true mean scores are the same after normal sleep and after 4 hours of sleep.',
+            ['Describes a Type I error in context: concluding mean scores are higher after normal sleep when in fact the true mean difference is 0.']
           ),
         },
       ],
@@ -277,11 +298,11 @@ export const statsFullFrqExam1: StatsFullFrqExam = {
         },
         {
           label: 'C',
-          text: 'Calculate the standard deviation of X.',
+          text: 'The standard deviation of X is 1.08 snack items. Interpret the standard deviation in context.',
           answerType: 'text',
           answer: frqAnswer(
-            'σX = √[(0 − 1.39)²(0.21) + (1 − 1.39)²(0.39) + (2 − 1.39)²(0.25) + (3 − 1.39)²(0.10) + (4 − 1.39)²(0.05)] ≈ √1.158 ≈ 1.08.',
-            ['Calculates σX ≈ 1.08 (1.07 to 1.08) with work or a calculator method. Reporting the variance (1.158) does not earn the point.']
+            'The number of snack items bought by randomly selected concession customers typically varies by about 1.08 items from the mean of 1.39 items.',
+            ['Interprets the standard deviation as a typical distance from the mean: the number of snack items a randomly selected customer buys typically varies by about 1.08 items from the mean of 1.39. "1.08 is the average number of items" or a description with no context does not earn the point.']
           ),
         },
         {
