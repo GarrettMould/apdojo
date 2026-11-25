@@ -4,6 +4,8 @@
  * My Bookings page. Only the server reads or writes the collection.
  */
 
+import type { SharedLessonNotes } from '@/lib/tutoringLessons';
+
 export const TUTORING_BOOKINGS_COLLECTION = 'tutoringBookings';
 
 /** The booking-page metadata key that carries the AP Dojo user id from the embed into the booking. */
@@ -22,6 +24,8 @@ export interface TutoringBooking {
   attendeeName: string | null;
   /** Cal.com's page for this booking, where it can be rescheduled or cancelled. */
   manageUrl: string;
+  /** The tutor's notes for this session, once shared with the family. */
+  lessonNotes: SharedLessonNotes | null;
 }
 
 export function calManageBookingUrl(bookingUid: string): string {

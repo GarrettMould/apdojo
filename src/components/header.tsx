@@ -16,6 +16,7 @@ import type { CourseSubject } from '@/lib/courseSubject';
 import { defaultCheatSheetUrl, isCourseSubject, isEconCourse } from '@/lib/courseSubject';
 import { useSubjectSwitchNavigation } from '@/hooks/useSubjectSwitchNavigation';
 import { FEATURES } from '@/lib/featureFlags';
+import { isAdminUserData } from '@/lib/isAdmin';
 import { SCOTUS_CASE_LANDING_HUB } from '@/data/gov/scotusRequiredCases';
 
 export function Header() {
@@ -42,6 +43,7 @@ export function Header() {
   const searchParams = useSearchParams();
   const handleSubjectSwitch = useSubjectSwitchNavigation();
   const isTeacher = !!(user && userData?.teacher === true);
+  const isAdmin = !!user && isAdminUserData(userData);
 
   // Ensure component is mounted before using selectedSubject to prevent hydration mismatch
   useEffect(() => {
@@ -455,14 +457,22 @@ export function Header() {
                                   >
                                     My bookings
                                   </Link>
-                                  {/* Placeholder until progress reports exist */}
-                                  <a
-                                    href="#"
-                                    onClick={(e) => e.preventDefault()}
+                                  <Link
+                                    href="/progress"
+                                    onClick={() => setIsBeltDropdownOpen(false)}
                                     className="w-full text-left px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 transition-colors rounded-md font-medium"
                                   >
                                     Progress reports
-                                  </a>
+                                  </Link>
+                                  {isAdmin && (
+                                    <Link
+                                      href="/admin/lessons"
+                                      onClick={() => setIsBeltDropdownOpen(false)}
+                                      className="w-full text-left px-4 py-2 text-sm text-gray-800 hover:bg-gray-100 transition-colors rounded-md font-medium"
+                                    >
+                                      Lesson notes
+                                    </Link>
+                                  )}
                                 </div>
                               )}
 
@@ -677,14 +687,22 @@ export function Header() {
                     >
                       My bookings
                     </Link>
-                    {/* Placeholder until progress reports exist */}
-                    <a
-                      href="#"
-                      onClick={(e) => e.preventDefault()}
+                    <Link
+                      href="/progress"
+                      onClick={closeMobileMenu}
                       className="px-4 py-3 text-lg font-bold text-gray-800 hover:bg-gray-100 rounded-xl transition-colors"
                     >
                       Progress reports
-                    </a>
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        href="/admin/lessons"
+                        onClick={closeMobileMenu}
+                        className="px-4 py-3 text-lg font-bold text-gray-800 hover:bg-gray-100 rounded-xl transition-colors"
+                      >
+                        Lesson notes
+                      </Link>
+                    )}
                   </div>
                 )}
 

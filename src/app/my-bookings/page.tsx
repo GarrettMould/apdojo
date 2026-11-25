@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
-import { ArrowRight, CalendarDays, Loader2, Video } from 'lucide-react';
+import { ArrowRight, CalendarDays, ChevronDown, Loader2, NotebookPen, Plus, Video } from 'lucide-react';
+import LessonNotesView from '@/components/tutoring/LessonNotesView';
 import { useAuthContext } from '@/contexts/AuthContext';
 import type { TutoringBooking } from '@/lib/tutoringBookings';
 
@@ -11,6 +12,8 @@ const primaryButton =
   'inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700';
 const secondaryButton =
   'inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50';
+
+const DOT = { 1: 'bg-red-400', 2: 'bg-amber-400', 3: 'bg-emerald-500' } as const;
 
 const STATUS_LABELS: Partial<Record<TutoringBooking['status'], { label: string; className: string }>> = {
   pending: { label: 'Awaiting confirmation', className: 'bg-amber-50 text-amber-800 ring-amber-200' },
@@ -41,35 +44,78 @@ function formatWhen(booking: TutoringBooking) {
 function BookingCard({ booking, upcoming }: { booking: TutoringBooking; upcoming: boolean }) {
   const { day, time } = formatWhen(booking);
   const badge = STATUS_LABELS[booking.status];
+  const [notesOpen, setNotesOpen] = useState(false);
+  const notes = booking.lessonNotes;
+
   return (
-    <li className={`${card} flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6`}>
-      <div className="flex min-w-0 items-start gap-4">
-        <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-          <CalendarDays className="h-5 w-5" aria-hidden />
-        </span>
-        <div className="min-w-0">
-          <p className="font-semibold text-slate-900">{day}</p>
-          {time ? <p className="text-sm text-slate-600">{time}</p> : null}
-          <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-500">
-            <span>{booking.title}</span>
-            {badge ? (
-              <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${badge.className}`}>
-                {badge.label}
-              </span>
-            ) : null}
-          </p>
+    <li className={`${card} overflow-hidden`}>
+      <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+        <div className="flex min-w-0 items-start gap-4">
+          <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+            <CalendarDays className="h-5 w-5" aria-hidden />
+          </span>
+          <div className="min-w-0">
+            <p className="font-semibold text-slate-900">{day}</p>
+            {time ? <p className="text-sm text-slate-600">{time}</p> : null}
+            <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-500">
+              <span>{booking.title}</span>
+              {badge ? (
+                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${badge.className}`}>
+                  {badge.label}
+                </span>
+              ) : null}
+            </p>
+          </div>
         </div>
-      </div>
-      {upcoming ? (
         <div className="flex flex-wrap gap-2 sm:shrink-0 sm:justify-end">
-          {booking.meetingUrl && booking.status === 'confirmed' ? (
+          {upcoming && booking.meetingUrl && booking.status === 'confirmed' ? (
             <a href={booking.meetingUrl} target="_blank" rel="noopener noreferrer" className={primaryButton}>
               <Video className="h-4 w-4" aria-hidden /> Join meeting
             </a>
           ) : null}
-          <a href={booking.manageUrl} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
-            Reschedule or cancel
-          </a>
+          {upcoming ? (
+            <a href={booking.manageUrl} target="_blank" rel="noopener noreferrer" className={secondaryButton}>
+              Reschedule or cancel
+            </a>
+          ) : null}
+        </div>
+      </div>
+      {notes ? (
+        <div className="border-t border-slate-100">
+          <button
+            type="button"
+            onClick={() => setNotesOpen((open) => !open)}
+            aria-expanded={notesOpen}
+            className="flex w-full items-center gap-4 px-5 py-4 text-left transition hover:bg-slate-50/70 sm:px-6"
+          >
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f7f2e8] text-stone-700">
+              <NotebookPen className="h-5 w-5" aria-hidden />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="text-sm font-bold text-slate-900">Lesson notes</span>
+                {notes.skills.length > 0 ? (
+                  <span className="flex items-center gap-1" aria-label={`${notes.skills.length} skills checked`}>
+                    {notes.skills.map((s, i) => (
+                      <span key={i} className={`h-2 w-2 rounded-full ${DOT[s.level]}`} />
+                    ))}
+                  </span>
+                ) : null}
+              </span>
+              {!notesOpen ? (
+                <span className="mt-0.5 line-clamp-1 text-sm text-slate-500">{notes.notes.summary}</span>
+              ) : null}
+            </span>
+            <span className="flex shrink-0 items-center gap-1 text-sm font-semibold text-blue-600">
+              {notesOpen ? 'Hide' : 'Read'}
+              <ChevronDown className={`h-4 w-4 transition ${notesOpen ? 'rotate-180' : ''}`} aria-hidden />
+            </span>
+          </button>
+          {notesOpen ? (
+            <div className="px-5 pb-6 pt-1 sm:px-6">
+              <LessonNotesView shared={notes} />
+            </div>
+          ) : null}
         </div>
       ) : null}
     </li>
@@ -148,12 +194,24 @@ export default function MyBookingsPage() {
               ))}
             </ul>
           ) : (
-            <div className={`${card} flex flex-col items-start gap-4 p-6`}>
-              <p className="text-slate-700">You have no upcoming sessions.</p>
-              <Link href="/tutoring#calendar" className={primaryButton}>
-                Book a session <ArrowRight className="h-4 w-4" aria-hidden />
-              </Link>
-            </div>
+            <Link
+              href="/tutoring#book"
+              className={`${card} group flex items-center gap-4 p-5 transition hover:-translate-y-px hover:border-blue-200 hover:shadow-[0_8px_24px_-12px_rgba(37,99,235,0.35)] sm:gap-5 sm:p-6`}
+            >
+              <span className="relative inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                <CalendarDays className="h-7 w-7" aria-hidden />
+                <span className="absolute -right-1 -top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-white ring-4 ring-white">
+                  <Plus className="h-3 w-3" strokeWidth={3} aria-hidden />
+                </span>
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-bold text-slate-900">Book your next session</span>
+                <span className="block text-sm text-slate-500">Pick a time that works. 1-on-1 with Garrett over video.</span>
+              </span>
+              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-600 text-white transition group-hover:translate-x-0.5 group-hover:bg-blue-700">
+                <ArrowRight className="h-5 w-5" aria-hidden />
+              </span>
+            </Link>
           )}
         </section>
 

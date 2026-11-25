@@ -11,7 +11,7 @@ export function TutoringPageView() {
   return null;
 }
 
-/** "Book a session" anchor that scrolls to the booking section and fires `tutoring_book_click`. */
+/** "Book a session" link that scrolls to the booking section and fires `tutoring_book_click`. */
 export function TutoringBookLink({
   source,
   className,

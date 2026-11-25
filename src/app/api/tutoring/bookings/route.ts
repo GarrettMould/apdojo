@@ -6,6 +6,8 @@ import {
   type TutoringBooking,
   type TutoringBookingStatus,
 } from '@/lib/tutoringBookings';
+import { TUTORING_LESSONS_COLLECTION, readSharedNotes } from '@/lib/tutoringLessons';
+import { withBoardLinks } from '@/lib/lessonBoardsServer';
 
 export const runtime = 'nodejs';
 
@@ -53,8 +55,28 @@ export async function GET(req: Request) {
           meetingUrl: typeof data.meetingUrl === 'string' ? data.meetingUrl : null,
           attendeeName: typeof data.attendeeName === 'string' ? data.attendeeName : null,
           manageUrl: calManageBookingUrl(doc.id),
+          lessonNotes: null,
         });
       });
+    }
+
+    // Lesson notes the tutor has shared. Only the shared snapshot is read out: never drafts or transcripts.
+    if (byId.size > 0) {
+      const lessons = adminDb.collection(TUTORING_LESSONS_COLLECTION);
+      const lessonRefs = [...byId.keys()].map((id) => lessons.doc(id));
+      for (const lessonDoc of await adminDb.getAll(...lessonRefs)) {
+        const booking = byId.get(lessonDoc.id);
+        const data = lessonDoc.data();
+        if (booking && data?.status === 'shared') booking.lessonNotes = readSharedNotes(data.shared);
+      }
+      // Whiteboards get short-lived viewing links; the files themselves are private.
+      await Promise.all(
+        [...byId.values()].map(async (booking) => {
+          if (booking.lessonNotes?.boards.length) {
+            booking.lessonNotes.boards = await withBoardLinks(booking.id, booking.lessonNotes.boards);
+          }
+        }),
+      );
     }
 
     const list = [...byId.values()].sort((a, b) => (a.startTime ?? '').localeCompare(b.startTime ?? ''));

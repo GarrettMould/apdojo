@@ -31,6 +31,8 @@ type CalPayload = {
   attendees?: CalPerson[];
   metadata?: Record<string, unknown>;
   videoCallData?: { url?: string };
+  /** Answers to the booking form, keyed by field name. */
+  responses?: Record<string, { label?: string; value?: unknown } | unknown>;
 };
 type CalWebhookEvent = { triggerEvent?: string; payload?: CalPayload };
 
@@ -63,6 +65,19 @@ function meetingUrlFor(payload: CalPayload): string | null {
   const candidates = [payload.metadata?.videoCallUrl, payload.videoCallData?.url, payload.location];
   for (const candidate of candidates) {
     if (typeof candidate === 'string' && candidate.startsWith('https://')) return candidate;
+  }
+  return null;
+}
+
+/** The booking form's answer to a subject/class/course question, if the form asks one. */
+function subjectAnswerFor(payload: CalPayload): string | null {
+  for (const [name, response] of Object.entries(payload.responses ?? {})) {
+    const entry = (response && typeof response === 'object' ? response : { value: response }) as {
+      label?: string;
+      value?: unknown;
+    };
+    if (!/subject|class|course/i.test(`${name} ${entry.label ?? ''}`)) continue;
+    if (typeof entry.value === 'string' && entry.value.trim()) return entry.value.trim().slice(0, 200);
   }
   return null;
 }
@@ -132,6 +147,8 @@ export async function POST(req: Request) {
   if (payload.type) record.eventType = payload.type;
   if (payload.startTime) record.startTime = payload.startTime;
   if (payload.endTime) record.endTime = payload.endTime;
+  const subjectAnswer = subjectAnswerFor(payload);
+  if (subjectAnswer) record.subjectAnswer = subjectAnswer;
   const meetingUrl = meetingUrlFor(payload);
   if (meetingUrl) record.meetingUrl = meetingUrl;
 

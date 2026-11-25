@@ -2,15 +2,9 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { ArrowRight, Check, ChevronDown, Star } from 'lucide-react';
-import {
-  FREE_SEASON_PASS_LINE,
-  TUTOR,
-  TUTORING_FAQ,
-  TUTORING_SESSION_TYPES,
-  calBookingUrl,
-} from '@/data/tutoring';
+import { TUTOR, TUTORING_FAQ, TUTORING_SESSION_TYPES } from '@/data/tutoring';
 import { tutoringReviews } from '@/data/reviews';
-import { TutoringBookingEmbed } from '@/components/tutoring/TutoringBookingEmbed';
+import { TutoringBookingSection } from '@/components/tutoring/TutoringBookingSection';
 import { TutoringBookLink, TutoringPageView } from '@/components/tutoring/TutoringTracking';
 import { FEATURES } from '@/lib/featureFlags';
 import headshot from '../../../public/images/Headshot.jpg';
@@ -82,7 +76,6 @@ function ReviewCard({ review }: { review: (typeof tutoringReviews)[number] }) {
 
 export default function TutoringPage() {
   if (!FEATURES.tutoring) notFound();
-  const primarySession = TUTORING_SESSION_TYPES[0];
   const featured = tutoringReviews.slice(0, FEATURED_REVIEW_COUNT);
   const more = tutoringReviews.slice(FEATURED_REVIEW_COUNT);
 
@@ -169,57 +162,11 @@ export default function TutoringPage() {
         </div>
       </section>
 
+      {/* 2. Booking: a full-screen section, wide enough for the calendar and times side by side */}
+      <TutoringBookingSection sessions={TUTORING_SESSION_TYPES} />
+
       <div className="px-4 pt-14 sm:pt-16">
       <div className="mx-auto flex max-w-5xl flex-col gap-14 sm:gap-16">
-        {/* 2. Price and booking, side by side */}
-        <section
-          id="book"
-          aria-labelledby="book-heading"
-          className="grid scroll-mt-24 grid-cols-1 items-start gap-6 lg:grid-cols-[340px_1fr]"
-        >
-          <div className="flex flex-col gap-4 lg:sticky lg:top-24">
-            <h2 id="book-heading" className={sectionHeading}>
-              Book a session
-            </h2>
-            {TUTORING_SESSION_TYPES.map((session) => (
-              <div key={session.id} className={`${card} flex flex-col gap-4 p-6`}>
-                <div>
-                  <h3 className="text-lg font-bold tracking-tight">{session.name}</h3>
-                  <p className="mt-1 flex items-baseline gap-1.5">
-                    <span className="text-4xl font-bold tracking-tight text-slate-900">{session.price}</span>
-                    {session.priceUnit ? <span className="text-base text-slate-500">{session.priceUnit}</span> : null}
-                  </p>
-                </div>
-                <ul className="flex flex-col gap-2">
-                  {[...session.includes, FREE_SEASON_PASS_LINE].map((item) => (
-                    <li key={item} className="flex items-start gap-2.5 text-[15px] leading-relaxed text-slate-700">
-                      <Check className="mt-1 h-4 w-4 shrink-0 text-blue-600" strokeWidth={2.5} aria-hidden />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-            <p className="text-sm text-slate-500">
-              Pick a time on the calendar. Times are shown in your time zone, and you&apos;ll get a confirmation email
-              with your Google Meet link.
-            </p>
-          </div>
-          <div id="calendar" className="min-w-0 scroll-mt-24 lg:pt-[44px]">
-            <TutoringBookingEmbed sessions={TUTORING_SESSION_TYPES} />
-            <noscript>
-              <a
-                href={calBookingUrl(primarySession.calLink)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-base font-semibold text-blue-600 underline"
-              >
-                Open the booking page <ArrowRight className="h-4 w-4" aria-hidden />
-              </a>
-            </noscript>
-          </div>
-        </section>
-
         {/* 3. Who it's for + how a session works */}
         <section className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-8">
           <div className="flex flex-col gap-4" aria-labelledby="who-for-heading">

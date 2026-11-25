@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { allQuestions } from '@/data/unitPracticeProblems/unitPracticeProblems';
 import { Question, QuestionBank } from '@/data/questionBanks/types';
 import { FullExam } from '@/components/FullExam';
+import type { CourseSubject } from '@/lib/courseSubject';
 import { AlertCircle, Home, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -13,7 +14,7 @@ function CustomExamContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [questionBank, setQuestionBank] = useState<QuestionBank | null>(null);
-  const [examType, setExamType] = useState<'macro' | 'micro' | null>(null);
+  const [examType, setExamType] = useState<CourseSubject | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -76,7 +77,14 @@ function CustomExamContent() {
 
       // Determine exam type from questions (use the first question's subject)
       const firstQuestion = filteredQuestions[0];
-      const determinedExamType: 'macro' | 'micro' = firstQuestion.subject === 'ap_macroeconomics' ? 'macro' : 'micro';
+      const determinedExamType: CourseSubject =
+        firstQuestion.subject === 'ap_macroeconomics'
+          ? 'macro'
+          : firstQuestion.subject === 'ap_us_government'
+            ? 'gov'
+            : firstQuestion.subject === 'ap_statistics'
+              ? 'stats'
+              : 'micro';
 
       // Create QuestionBank
       const bank: QuestionBank = {

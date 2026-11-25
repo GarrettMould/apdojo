@@ -360,7 +360,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
   const [timeRemaining, setTimeRemaining] = useState(initialTimeLimit);
   
   // State to hide/show timer
-  const [showTimer, setShowTimer] = useState(true);
+  // Practice sets aren't timed tests: the timer starts hidden (one click shows it).
+  const [showTimer, setShowTimer] = useState(!isCustomAssignment);
   const [questionFontSize, setQuestionFontSize] = useState(1); // 0=sm, 1=base, 2=lg, 3=xl
   const FONT_SIZE_CLASSES = ['text-sm', 'text-base', 'text-lg', 'text-xl'];
   const FONT_SIZE_MAX = 3;
@@ -1746,7 +1747,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
       {/* Name Input Modal for Custom Assignments Only */}
       {showNameInputModal && isCustomAssignment && typeof window !== 'undefined' && feedbackContainer && createPortal(
         <div className="fixed inset-0 bg-white/40 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 border-4 border-black z-10">
+          <div className="bg-white rounded-3xl shadow-[0_24px_60px_-16px_rgba(15,23,42,0.35)] max-w-md w-full p-7 z-10">
             <div className="flex items-center gap-3 mb-4">
               <FileText className="w-6 h-6 text-blue-600" />
               <h3 className="text-xl font-black text-gray-900">
@@ -1767,7 +1768,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                   }
                 }}
                 placeholder="Your name"
-                className="w-full px-4 py-3 border-2 border-black rounded-lg font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-slate-300 rounded-xl font-semibold text-gray-900 focus:outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
                 autoFocus
               />
             </div>
@@ -1775,7 +1776,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               <button
                 onClick={handleNameSubmit}
                 disabled={!studentName.trim()}
-                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-lg transition-colors duration-200 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold rounded-xl transition-colors duration-200"
               >
                 Reveal Results
               </button>
@@ -1931,8 +1932,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
       {/* Video Slide-Out Panel */}
       <div 
-        className={`fixed right-0 top-0 h-full w-[45%] bg-white shadow-2xl z-40 border-l border-gray-200 transform transition-transform duration-300 ease-in-out ${
-          showVideoModal && videoUrl ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed right-0 top-0 h-full w-[45%] bg-white z-40 border-l border-gray-200 transform transition-transform duration-300 ease-in-out ${
+          showVideoModal && videoUrl ? 'translate-x-0 shadow-2xl' : 'translate-x-full'
         }`}
       >
         {showVideoModal && videoUrl && (
@@ -2015,14 +2016,19 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                 >
                   <Image src="/images/dojoIconJan26.svg" alt="" width={26} height={26} unoptimized />
                   {isCustomAssignment ? (
-                    <span className="hidden sm:inline text-sm font-black text-gray-900 tracking-wide">Custom Assignment</span>
+                    <span className="hidden sm:inline text-sm font-bold text-slate-900">
+                      Practice set{' '}
+                      <span className="font-medium text-slate-400">
+                        · {examType === 'macro' ? 'AP Macro' : examType === 'micro' ? 'AP Micro' : examType === 'gov' ? 'AP Gov' : 'AP Stats'}
+                      </span>
+                    </span>
                   ) : (
                     <span className="hidden sm:inline text-sm font-black text-gray-900 tracking-wide">AP Dojo</span>
                   )}
                 </button>
                 {/* Center: section label */}
                 <span className="text-sm font-medium text-gray-500 hidden sm:block">
-                  {isCustomAssignment ? `${questions.length} Questions` : 'Section I – Multiple Choice'}
+                  {isCustomAssignment ? `Question ${currentPage + 1} of ${questions.length}` : 'Section I – Multiple Choice'}
                 </span>
                 {/* Right: controls (icon-only below sm so the bar fits on phones) */}
                 <div className="flex items-center gap-1 sm:gap-1.5">
@@ -2276,45 +2282,6 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-40"></div>
           )}
 
-          {/* Resources Panel - Custom Assignments only */}
-          {isCustomAssignment && (
-            <div className="fixed top-14 right-0 w-44 bg-white border-l border-gray-200 flex flex-col z-30" style={{ height: 'calc(100vh - 56px)' }}>
-              <div className="px-4 pt-5 pb-3 border-b border-gray-100">
-                <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Resources</p>
-              </div>
-              <nav className="flex flex-col gap-0.5 p-3 flex-1">
-                {[
-                  { label: 'Practice Tests', href: '/unit-final-practice-tests', icon: '📋' },
-                  { label: 'Cheat Sheets', href: '/cheat-sheets', icon: '📄' },
-                  { label: 'Unit Reviews', href: '/unit-review', icon: '📚' },
-                  { label: 'Graph Gym', href: '/graph-gym', icon: '📈' },
-                  { label: 'AP Dojo Home', href: '/', icon: '🏠' },
-                ].map(({ label, href, icon }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2.5 px-3 py-2.5 rounded text-xs font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-                  >
-                    <span className="text-sm leading-none">{icon}</span>
-                    <span className="leading-tight">{label}</span>
-                  </a>
-                ))}
-              </nav>
-              <div className="p-3 border-t border-gray-100">
-                <a
-                  href="https://apdojo.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-3 py-2"
-                >
-                  <Image src="/images/dojoIconJan26.svg" alt="AP Dojo" width={18} height={18} unoptimized />
-                  <span className="text-[10px] font-black text-gray-400 tracking-wide">AP DOJO</span>
-                </a>
-              </div>
-            </div>
-          )}
           {/* Question Container (Left Side / Top on Mobile) */}
           <motion.div 
             animate={{
@@ -2331,7 +2298,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
               isLiveSession
                 ? 'p-6 md:p-8 max-w-4xl mx-auto'
                 : isCustomAssignment
-                  ? 'p-8 max-w-4xl mx-auto pr-52'
+                  ? 'px-4 py-6 sm:p-8 max-w-5xl mx-auto'
                   : showVideoModal && videoUrl
                     ? 'p-8'
                     : showToolsPanel
@@ -2430,7 +2397,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                         isLiveSession
                           ? 'rounded-3xl shadow-xl border border-slate-200 p-6 md:p-8'
                           : isCustomAssignment
-                            ? 'border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] p-6 md:p-8'
+                            ? 'rounded-3xl border border-slate-200 shadow-[0_1px_3px_rgba(15,23,42,0.06)] p-5 md:p-8'
                           : isUnitTest
                             ? 'p-4 md:p-8'
                             : 'rounded-lg shadow-md border border-gray-200 p-6 md:p-8'
@@ -2728,7 +2695,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
 
                           {/* Visual Content - Show below question text for custom assignments */}
                           {isCustomAssignment && question.image && (
-                            <div className="bg-white border-2 border-gray-300 rounded-xl shadow-sm p-4 flex justify-center">
+                            <div className="flex justify-center">
                               <ExpandableQuestionImage
                                 src={
                                   typeof question.image === 'string'
@@ -2740,13 +2707,14 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                     ? 'Question diagram'
                                     : (question.image as any).alt || 'Question diagram'
                                 }
-                                imageClassName="w-full max-w-3xl h-auto object-contain rounded-lg border border-slate-200 shadow-sm"
+                                wrapperClassName="gap-2 rounded-xl border border-slate-200 bg-white p-3 sm:p-4"
+                                imageClassName="w-full max-w-3xl h-auto object-contain"
                               />
                             </div>
                           )}
 
                           {isCustomAssignment && question.tableData && (
-                            <div className="bg-white border-2 border-gray-300 rounded-xl shadow-sm p-4">
+                            <div className="bg-white rounded-xl border border-slate-200 p-4">
                               <div className="flex items-center gap-4">
                                 {question.tableData.playerNames && (
                                   <div className="flex items-center justify-center h-full w-16">
@@ -2824,7 +2792,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                         isLiveSession
                                           ? 'rounded-xl shadow-lg border border-slate-200'
                                           : isCustomAssignment
-                                            ? 'border-2 border-black rounded-lg shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]'
+                                            ? 'rounded-xl border border-slate-200'
                                             : 'rounded-lg border'
                                       } ${
                                         showResults ?
@@ -2835,25 +2803,25 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                           isLiveSession
                                             ? 'bg-slate-100 border-slate-200 opacity-60 cursor-pointer'
                                             : isCustomAssignment
-                                              ? 'bg-gray-100 border-black opacity-60 cursor-pointer'
+                                              ? 'bg-slate-50 border-slate-200 opacity-60 cursor-pointer'
                                               : 'bg-gray-100 border-gray-300 opacity-60 cursor-pointer'
                                         : isSelected ?
                                           isLiveSession
                                             ? 'bg-blue-50 border-2 border-blue-300 shadow-md'
                                             : isCustomAssignment
-                                              ? 'bg-blue-100 border-2 border-blue-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                              ? 'bg-blue-50 border-blue-500 ring-1 ring-inset ring-blue-500'
                                               : 'bg-blue-100 border-2 border-blue-500 shadow-md'
                                         :
                                           isLiveSession
                                             ? 'bg-white hover:bg-slate-50 border-slate-200 hover:shadow-md'
                                             : isCustomAssignment
-                                              ? 'bg-white hover:bg-gray-50 border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                              ? 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300'
                                               : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
                                       }`}
                                     >
                                       {/* Letter bubble */}
                                       <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs flex-shrink-0 ${
-                                        isLiveSession ? 'font-normal text-blue-500 border border-slate-200 bg-white' : isCustomAssignment ? 'border-2 border-black font-normal' : 'border font-normal'
+                                        isLiveSession ? 'font-normal text-blue-500 border border-slate-200 bg-white' : isCustomAssignment ? 'border font-semibold' : 'border font-normal'
                                       } ${
                                         !isLiveSession && (showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-normal' : 'bg-white border-gray-300 text-gray-600')
                                       } ${isLiveSession && isStruckThrough ? 'opacity-60' : ''}`}>
@@ -2912,7 +2880,7 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                         isLiveSession
                                           ? 'rounded-xl shadow-lg border border-slate-200'
                                           : isCustomAssignment
-                                            ? 'border-2 border-black rounded-lg shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]'
+                                            ? 'rounded-xl border border-slate-200'
                                             : 'rounded-lg border'
                                       } ${
                                         showResults ?
@@ -2923,25 +2891,25 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                                           isLiveSession
                                             ? 'bg-slate-100 border-slate-200 opacity-60 cursor-pointer'
                                             : isCustomAssignment
-                                              ? 'bg-gray-100 border-black opacity-60 cursor-pointer'
+                                              ? 'bg-slate-50 border-slate-200 opacity-60 cursor-pointer'
                                               : 'bg-gray-100 border-gray-300 opacity-60 cursor-pointer'
                                         : isSelected ?
                                           isLiveSession
                                             ? 'bg-blue-50 border-2 border-blue-300 shadow-md'
                                             : isCustomAssignment
-                                              ? 'bg-blue-100 border-2 border-blue-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                              ? 'bg-blue-50 border-blue-500 ring-1 ring-inset ring-blue-500'
                                               : 'bg-blue-100 border-2 border-blue-500 shadow-md'
                                         :
                                           isLiveSession
                                             ? 'bg-white hover:bg-slate-50 border-slate-200 hover:shadow-md'
                                             : isCustomAssignment
-                                              ? 'bg-white hover:bg-gray-50 border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                              ? 'bg-white hover:bg-slate-50 border-slate-200 hover:border-slate-300'
                                               : 'bg-transparent hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:shadow-sm'
                                       }`}
                                     >
                                       {/* Letter bubble */}
                                       <span className={`w-6 h-6 flex items-center justify-center rounded-full text-xs flex-shrink-0 ${
-                                        isLiveSession ? 'font-normal text-blue-500 border border-slate-200 bg-white' : isCustomAssignment ? 'border-2 border-black font-normal' : 'border font-normal'
+                                        isLiveSession ? 'font-normal text-blue-500 border border-slate-200 bg-white' : isCustomAssignment ? 'border font-semibold' : 'border font-normal'
                                       } ${
                                         !isLiveSession && (showResults ? (isCorrect ? 'bg-green-100 border-green-300 text-green-700' : isSelected ? 'bg-red-100 border-red-300 text-red-700' : 'bg-white border-gray-300 text-gray-500') : isStruckThrough ? 'bg-gray-200 border-gray-300 text-gray-400' : isSelected ? 'bg-blue-500 border-blue-600 text-white font-normal' : 'bg-white border-gray-300 text-gray-600')
                                       } ${isLiveSession && isStruckThrough ? 'opacity-60' : ''}`}>
@@ -3993,7 +3961,8 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
             {/* Sec label (unit test only) */}
             {isUnitTest && (
               <span className="hidden sm:block text-xs text-gray-400 font-normal shrink-0">
-                {unitMcqTestFooterLabel ?? `Sec I-A • ${questions.length} Questions`}
+                {unitMcqTestFooterLabel ??
+                  (isCustomAssignment ? `${questions.length}-question practice set` : `Sec I-A • ${questions.length} Questions`)}
               </span>
             )}
             {/* Question Navigator Button */}
