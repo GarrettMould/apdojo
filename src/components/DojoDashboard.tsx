@@ -25,6 +25,8 @@ import {
 } from '@/lib/utils';
 import { loadTestProgress } from '@/lib/testProgress';
 import { blogPosts, type BlogPost } from '@/data/blogPosts';
+import { TEACHING_GUIDES, guideHref } from '@/data/teachingGuides';
+import headshot from '../../public/images/Headshot.jpg';
 import { generateSeoUrl } from '@/utils/blogUrls';
 import {
   apEconomicsTagFromCourse,
@@ -639,6 +641,15 @@ export function DojoDashboard() {
   const displayedUnitExams = unitExams.slice(0, 4);
   const unitExamsSeeAllHref = getUnitFinalPracticeTestsUrl(currentCourse);
 
+  /** "Explained by Garrett" lesson guides for the current course: first in the row, at most two. */
+  const displayedGuides = useMemo(() => {
+    if (!isEconCourse(currentCourse)) return [];
+    const course = currentCourse === 'macro' ? 'ap-macroeconomics' : 'ap-microeconomics';
+    return TEACHING_GUIDES.filter((g) => g.course === course)
+      .sort((a, b) => a.lesson.localeCompare(b.lesson, undefined, { numeric: true }))
+      .slice(0, 2);
+  }, [currentCourse]);
+
   const displayedBlogPosts = useMemo(() => {
     if (!isEconCourse(currentCourse)) return [];
     const course = currentCourse === 'macro' ? 'macro' : 'micro';
@@ -667,9 +678,10 @@ export function DojoDashboard() {
 
     const picked: BlogPost[] = [];
     const seen = new Set<string>();
+    const postSlots = 4 - displayedGuides.length;
     for (const slug of order) {
       const post = bySlug[slug];
-      if (post && picked.length < 4) {
+      if (post && picked.length < postSlots) {
         picked.push(post);
         seen.add(slug);
       }
@@ -678,11 +690,11 @@ export function DojoDashboard() {
       .filter((p) => !seen.has(p.slug))
       .sort((a, b) => a.unit - b.unit || a.title.localeCompare(b.title));
     for (const post of rest) {
-      if (picked.length >= 4) break;
+      if (picked.length >= postSlots) break;
       picked.push(post);
     }
     return picked;
-  }, [currentCourse]);
+  }, [currentCourse, displayedGuides.length]);
 
   // Helper to check if drill is completed
   const isDrillCompleted = (drillId: string): boolean => {
@@ -728,7 +740,7 @@ export function DojoDashboard() {
             className="space-y-8"
           >
           {/* Economics Explained — blog posts for current course */}
-          {displayedBlogPosts.length > 0 && (
+          {(displayedGuides.length > 0 || displayedBlogPosts.length > 0) && (
           <motion.section variants={itemVariants}>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-black text-gray-900 uppercase tracking-wide">Economics Explained</h2>
@@ -741,6 +753,35 @@ export function DojoDashboard() {
               </Link>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {displayedGuides.map((guide) => (
+                  <div key={guide.slug} className="group">
+                    <Link href={guideHref(guide)}>
+                      <div className="bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 overflow-hidden text-left transition-all flex flex-col h-full">
+                        {/* No photo for guides: the lesson number and Garrett stand in for a thumbnail */}
+                        <div className="relative flex w-full aspect-[16/10] items-end justify-between border-b-2 border-gray-300 bg-blue-50 p-4">
+                          <span className="text-5xl font-black tabular-nums tracking-tight text-blue-700">{guide.lesson}</span>
+                          <span className="flex items-center gap-2 rounded-full bg-white/90 py-1 pl-1 pr-3 text-xs font-bold text-gray-800 shadow-sm">
+                            <Image src={headshot} alt="" width={24} height={24} className="h-6 w-6 rounded-full object-cover object-[50%_0%]" />
+                            Garrett
+                          </span>
+                        </div>
+                        <div className="p-6 flex flex-col flex-1">
+                          <div className="flex items-center gap-3 mb-4">
+                            <div className="w-10 h-10 rounded-xl bg-gray-100 border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                              <BookOpen className="w-5 h-5 text-gray-700" />
+                            </div>
+                            <div className="flex flex-col gap-1">
+                              <span className="text-xs font-medium text-gray-500">Unit {guide.unit.toString().padStart(2, '0')}</span>
+                              <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Explained by Garrett</span>
+                            </div>
+                          </div>
+                          <h3 className="text-xl font-black text-gray-900 mb-2 line-clamp-2">{guide.lessonName}</h3>
+                          <p className="text-sm text-gray-500 line-clamp-2 mt-auto">{guide.title}</p>
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
                 {displayedBlogPosts.map((post) => (
                 <div
                     key={post.slug}

@@ -127,7 +127,7 @@ export function SeasonPassModal({ subject, onClose, showFeatureBlur = false }: S
 
               <div className="relative rounded-xl border-2 border-black bg-gray-50 p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
                 <ul className="space-y-2.5">
-                  {FEATURES.map((feature, i) => (
+                  {[...FEATURES.slice(0, 3), ...(isEcon ? [{ text: 'Printable FRQ Packet + Scoring Guides' }] : []), ...FEATURES.slice(3)].map((feature, i) => (
                     <li key={i} className="flex items-start gap-2.5">
                       <CheckCircle2 className={`mt-0.5 h-4 w-4 shrink-0 ${listIconClass}`} />
                       <span className="text-sm font-semibold text-gray-800">{feature.text}</span>

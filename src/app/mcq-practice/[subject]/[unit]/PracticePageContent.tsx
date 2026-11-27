@@ -445,17 +445,6 @@ function OutOfQuestionsPanel({ missedGold, onUnlock }: { missedGold: boolean; on
   );
 }
 
-/** Under an ordinary question a Season Pass user missed: it comes back later in the session. */
-function GoldOutcomeNote({ outcome }: { outcome: GoldOutcome }) {
-  if (outcome.kind || outcome.correct || !outcome.backSoon) return null;
-  return (
-    <div className="mt-4 flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-      <RotateCcw className="h-4 w-4 shrink-0 text-sky-600" aria-hidden />
-      You will get another shot at this one in a few questions.
-    </div>
-  );
-}
-
 const DAILY_FREE_ANSWERS_DEFAULT = 3;
 
 export function PracticePageContent({ subject, unitNumber, practiceQuestions }: PracticePageContentProps) {
@@ -1533,11 +1522,6 @@ export function PracticePageContent({ subject, unitNumber, practiceQuestions }: 
                     kind={kindAt(currentQuestionIndex)!}
                     outcome={slotOutcomes[currentQuestionIndex]}
                   />
-                ) : null
-              }
-              answerFooter={
-                goldLoopOn && slotOutcomes[currentQuestionIndex] ? (
-                  <GoldOutcomeNote outcome={slotOutcomes[currentQuestionIndex]} />
                 ) : null
               }
             />

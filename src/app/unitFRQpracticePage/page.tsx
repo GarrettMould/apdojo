@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -35,6 +36,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { LoginModal, SignupModal } from '@/components/AuthModals';
 import { SeasonPassModal } from '@/components/SeasonPassModal';
 import FRQLibrarySidebar, { FRQItem } from '@/components/FRQLibrarySidebar';
+import { FrqOverview } from '@/components/frq/FrqOverview';
 import { cn, hasValidSeasonPass } from '@/lib/utils';
 import type { CourseSubject } from '@/lib/courseSubject';
 import { econCourseFromSubject } from '@/lib/courseSubject';
@@ -384,8 +386,16 @@ function UnitFRQPracticePageComponent() {
   /** When FRQ tutor panel is open (desktop), main column shifts left so it clears the chat. */
   const [frqTutorOpen, setFrqTutorOpen] = useState(false);
 
+  /** No specific FRQ requested (?frqId): show the welcome overview of the whole set first. */
+  const showOverview = !searchParams.get('frqId') && Boolean(frqEconSubject) && allQuestions.length > 0;
+
+  const openFrq = (id: number) => {
+    router.push(`/unitFRQpracticePage?frqId=${id}`);
+    window.scrollTo({ top: 0 });
+  };
+
   const showFrqTutorFab =
-    Boolean(frqEconSubject && frqQuestion && !isCurrentQuestionLocked);
+    Boolean(frqEconSubject && frqQuestion && !isCurrentQuestionLocked && !showOverview);
   useEffect(() => {
     if (!showFrqTutorFab) setFrqTutorOpen(false);
   }, [showFrqTutorFab]);
@@ -416,7 +426,12 @@ function UnitFRQPracticePageComponent() {
     setTotalXpEarned(0);
   }, [selectedSubject]);
 
+  /** Printing is a Season Pass feature; free students see the Season Pass offer instead. */
   const handlePrint = () => {
+    if (!isProCustomer) {
+      setShowSeasonPassModal(true);
+      return;
+    }
     window.print();
   };
 
@@ -776,7 +791,7 @@ function UnitFRQPracticePageComponent() {
       /> */}
 
       {/* Sidebar Toggle Button */}
-      {!isSidebarOpen && (
+      {!isSidebarOpen && !showOverview && (
         <button
           onClick={() => setIsSidebarOpen(true)}
           className="fixed top-1/2 -translate-y-1/2 left-0 z-40 print:hidden cursor-pointer bg-white border-r-2 border-t-2 border-b-2 border-gray-300 rounded-r-lg shadow-md hover:bg-gray-50 transition-colors px-3 py-8 flex items-center justify-center group"
@@ -798,7 +813,7 @@ function UnitFRQPracticePageComponent() {
       <div
         className={`fixed left-0 top-20 z-40 h-[calc(100vh-5rem)] w-4/5 bg-white shadow-xl transition-transform duration-300 ease-in-out print:hidden lg:w-1/4 ${
           isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        } ${showOverview ? 'hidden' : ''}`}
       >
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between border-b-2 border-black bg-gray-50 p-4">
@@ -833,9 +848,30 @@ function UnitFRQPracticePageComponent() {
         </div>
       </div>
 
+      {showOverview && frqEconSubject ? (
+        <FrqOverview
+          course={frqEconSubject}
+          questions={allQuestions}
+          isPro={isProCustomer}
+          isLocked={(q) => isQuestionLocked(q.id, q.unit)}
+          onOpen={(q) => openFrq(q.id)}
+          onLocked={() => setShowSeasonPassModal(true)}
+        />
+      ) : null}
+
+      {/* Without the Season Pass, printing (including the browser's own print) shows this note instead of the FRQ. */}
+      {!isProCustomer && !showOverview ? (
+        <div className="hidden px-10 py-24 text-center font-serif print:block">
+          <p className="text-2xl font-bold">Printing is included with the AP Dojo Season Pass.</p>
+          <p className="mt-3 text-lg">Get print-ready FRQs and the full FRQ packet at apdojo.com</p>
+        </div>
+      ) : null}
+
       <div
         className={cn(
           'mx-auto max-w-3xl px-4 py-8 pb-28 sm:px-8 print:max-w-none print:px-0 print:pb-0 print:py-0',
+          showOverview && 'hidden',
+          !isProCustomer && 'print:hidden',
           'transition-[margin-inline-end] duration-300 ease-out',
           frqTutorOpen &&
             'me-3 sm:me-6 md:me-[min(22rem,42vw)] lg:me-[min(26rem,32vw)] xl:me-[28rem]'
@@ -922,11 +958,27 @@ function UnitFRQPracticePageComponent() {
                       className="shrink-0"
                       onClick={handlePrint}
                       type="button"
+                      title={isProCustomer ? 'Print this FRQ' : 'Printing is included with the Season Pass'}
                     >
-                      <Printer className="mr-1.5 h-3.5 w-3.5" />
+                      {isProCustomer ? <Printer className="mr-1.5 h-3.5 w-3.5" /> : <Lock className="mr-1.5 h-3.5 w-3.5" />}
                       Print
                     </Button>
                     <ShareFRQButton questionId={frqQuestion.id} />
+                    {frqEconSubject ? (
+                      <Link
+                        href={`/frq-packet?course=${frqEconSubject}`}
+                        className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md px-2.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
+                      >
+                        <Printer className="h-3.5 w-3.5" aria-hidden />
+                        Full FRQ packet
+                      </Link>
+                    ) : null}
+                    <Link
+                      href="/unitFRQpracticePage"
+                      className="ml-auto inline-flex h-9 shrink-0 items-center rounded-md px-2.5 text-xs font-semibold text-gray-600 transition hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      All FRQs
+                    </Link>
                   </div>
 
                   <p className="mb-6 whitespace-pre-line text-base font-semibold leading-relaxed text-gray-900">

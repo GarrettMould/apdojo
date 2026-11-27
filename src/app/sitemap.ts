@@ -3,6 +3,7 @@ import { govUnits, macroUnits, microUnits, statsUnits } from '@/data/cheatSheets
 import { MACRO_LESSON_SLUGS, macroLessonHref } from '@/data/macroLessonPages';
 import { AP_GOV_REQUIRED_SCOTUS_CASES, SCOTUS_CASE_LANDING_HUB, scotusCaseLandingPath } from '@/data/gov/scotusRequiredCases';
 import { blogPosts } from '@/data/blogPosts';
+import { TEACHING_GUIDES, guideHref } from '@/data/teachingGuides';
 import { generateSeoUrl } from '@/utils/blogUrls';
 import { FEATURES } from '@/lib/featureFlags';
 
@@ -144,7 +145,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // IMPORTANT: Only return canonical URLs we actually want indexed.
   // Older /unit/{number} and /study-guides/... routes either duplicate or redirect
   // to these cheat sheet pages and should NOT be listed here to avoid redirect errors.
-  return [...staticPages, ...cheatSheetPages, ...deepDivePages, ...scotusCasePages, ...blogPostPages];
+  // "Explained by Garrett" lesson guides
+  const guidePages: MetadataRoute.Sitemap = [
+    { url: `${baseUrl}/guides`, changeFrequency: 'weekly', priority: 0.7 },
+    ...TEACHING_GUIDES.map((g) => ({
+      url: `${baseUrl}${guideHref(g)}`,
+      lastModified: new Date(g.updated),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
+  ];
+
+  return [...staticPages, ...cheatSheetPages, ...deepDivePages, ...scotusCasePages, ...blogPostPages, ...guidePages];
 }
 
 

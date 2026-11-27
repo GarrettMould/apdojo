@@ -67,6 +67,7 @@ import { processMathContent } from '@/utils/processMathContent';
 import { CheatSheetPdfPreviewThumbnail } from '@/components/CheatSheetPdfPreviewThumbnail';
 import { StatsCalculatorCheatSheetCta } from '@/components/StatsCalculatorCheatSheetCta';
 import { CheatSheetPdfCta } from '@/components/CheatSheetPdfCta';
+import { LessonReadingLine } from '@/components/guides/LessonReadingLine';
 import {
   GOV_UNIT_PDF_URLS,
   ULTIMATE_ADAS_PDF_URL,
@@ -2779,7 +2780,8 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
             return (
                     <React.Fragment key={lessonId}>
                       <div id={`lesson-${lessonId.replace('.', '-')}`} className="space-y-8 scroll-mt-24">
-              {/* Lesson Header — drag into study bucket to quiz the whole lesson */}
+              {/* Lesson Header — drag into study bucket to quiz the whole lesson — with its reading line */}
+              <div className="flex flex-col gap-2.5">
               <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b border-gray-200 pb-2">
               <h2
                 draggable
@@ -2798,19 +2800,9 @@ export default function UnitPage({ unitNumber: propUnitNumber, subject: propSubj
               >
                 {lessonId}{lessonName ? ` - ${lessonName}` : ''}
               </h2>
-              {(() => {
-                const lessonHref = selectedSubject === 'macro' ? macroLessonHref(lessonId) : null;
-                if (!lessonHref) return null;
-                return (
-                  <Link
-                    href={lessonHref}
-                    className="group mb-1 inline-flex shrink-0 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-3 py-1 text-sm font-semibold text-gray-700 transition-colors hover:border-gray-900 hover:text-gray-900"
-                  >
-                    Full lesson
-                    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                );
-              })()}
+              </div>
+              {/* What to read for this lesson (guide, articles) and the full Macro lesson, as one quiet line */}
+              <LessonReadingLine subject={selectedSubject} lessonId={lessonId} />
               </div>
 
               {/* Lesson Video — compact, alternates left/right with title + blurb beside */}

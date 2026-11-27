@@ -36,6 +36,7 @@ import { StatsFormulaSheet } from '@/components/stats/StatsFormulaSheet';
 import { db } from '@/lib/firebase';
 import { collection, addDoc, doc, updateDoc, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
 import { saveQuizResult } from '@/lib/quizHistory';
+import { GuideResultsHint } from '@/components/guides/GuideResultsHint';
 import { saveTestResult, saveTestProgress, loadTestProgress, hasUnitFrqTestResult, TestProgress } from '@/lib/testProgress';
 import { getMissedGuidedLessons, guidedUnitWrapUpHref, hasGuidedUnit } from '@/data/guidedLessons/lessonLinks';
 import { FEATURES } from '@/lib/featureFlags';
@@ -3488,6 +3489,13 @@ export function FullExam({ questionBank, examType, questionType, examNumber, onT
                           ) : null}
                         </div>
                       ) : null}
+                      {/* "Explained by Garrett" guides for lessons with missed questions (results only, never mid-test) */}
+                      <GuideResultsHint
+                        questions={questions}
+                        answers={answers}
+                        source={isCustomAssignment ? 'assignment-results' : 'unit-test-results'}
+                        includeLessonPages={!(FEATURES.guidedExplainers && missedGuidedLessons.length > 0)}
+                      />
                     </div>
                   ) : null}
                   <section>

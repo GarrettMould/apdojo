@@ -41,6 +41,7 @@ import { StatsFormulaSheet } from '@/components/stats/StatsFormulaSheet';
 import { ExpandableQuestionImage } from '@/components/ExpandableQuestionImage';
 import { courseSubjectFromQuestionSubject, type CourseSubject } from '@/lib/courseSubject';
 import '@excalidraw/excalidraw/index.css';
+import { GuideHint } from '@/components/guides/GuideHint';
 
 import dojoIcon from "../../public/images/dojoIcon.png";
 
@@ -1566,6 +1567,10 @@ const QuestionArena = ({ question, onAnswerSelect, initialSelectedLetter, isAnsw
                   <h4 className="font-semibold text-gray-900 mb-2 text-sm">Explanation</h4>
                   <p className="text-gray-900">{aiExplanation}</p>
                 </div>
+              ) : null}
+              {/* A lesson guide, if one exists: at most once per lesson per session */}
+              {!isLoadingAI ? (
+                <GuideHint subject={question.subject} lessonIds={question.lessonIDS} questionId={question.id} source="unit-practice" />
               ) : null}
             </motion.div>
           );
